@@ -1,4 +1,4 @@
-<BSB Dashboard html>
+<DashboardBSB html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -6,13 +6,13 @@
   <title>Dashboard BSB - Operacional</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: #1e293b;
-      --accent-red: #ef4444;
+      --bg-color: #0b1329;
+      --card-bg: #162238;
+      --card-border: #233554;
       --accent-green: #10b981;
-      --accent-yellow: #f59e0b;
-      --accent-blue: #3b82f6;
-      --text-main: #f8fafc;
+      --accent-blue: #0284c7;
+      --accent-red: #ef4444;
+      --text-main: #ffffff;
       --text-muted: #94a3b8;
     }
 
@@ -20,13 +20,13 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      padding: 20px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -37,93 +37,130 @@
       justify-content: space-between;
       align-items: center;
       background-color: var(--card-bg);
-      padding: 15px 25px;
+      padding: 16px 24px;
       border-radius: 12px;
-      border-left: 6px solid var(--accent-red);
+      border: 1px solid var(--card-border);
     }
 
     header h1 {
-      font-size: 1.8rem;
-      letter-spacing: 1px;
+      font-size: 1.6rem;
+      letter-spacing: 0.5px;
+      font-weight: 700;
     }
 
-    .status-badge {
-      background-color: #334155;
+    .relogio {
+      background-color: #0f172a;
       padding: 8px 16px;
       border-radius: 20px;
-      font-size: 0.9rem;
-      font-weight: bold;
+      font-size: 1rem;
+      font-weight: 600;
+      border: 1px solid var(--card-border);
     }
 
     .grid-container {
       display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
     }
 
     .card {
       background-color: var(--card-bg);
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
     }
 
-    .card h2 {
-      font-size: 1.3rem;
-      margin-bottom: 15px;
+    .card-title {
+      font-size: 1.2rem;
       color: var(--text-muted);
-      border-bottom: 1px solid #334155;
-      padding-bottom: 8px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
-    /* Estilos do Teatro de Operacoes e Canais */
-    .info-list {
+    /* ESTILO BASEADO NAS FOTOS */
+    .to-card-active {
+      background: linear-gradient(180deg, #1e2d4a 0%, #162238 100%);
+      border: 1px solid #2d4268;
+      border-left: 5px solid var(--accent-green);
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .to-header {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .to-header h3 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .to-header .to-data {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .to-box-location {
+      background-color: rgba(15, 23, 42, 0.6);
+      border: 1px solid #2a3d61;
+      border-radius: 10px;
+      padding: 14px 16px;
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .info-item {
+    .to-local-linha {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background-color: #0f172a;
-      padding: 12px 16px;
-      border-radius: 8px;
+      gap: 8px;
+      color: #38bdf8;
+      font-size: 1.15rem;
+      font-weight: 600;
     }
 
-    .info-label {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    .info-value {
-      font-weight: bold;
-      font-size: 1.1rem;
-    }
-
-    .badge-canal {
-      background-color: var(--accent-blue);
-      color: white;
-      padding: 4px 10px;
-      border-radius: 6px;
+    .to-canal-linha {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       font-size: 1rem;
+      color: #cbd5e1;
     }
 
-    /* Tabela de Viaturas */
+    .badge-bsb {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* TABELA DE VIATURAS */
     table {
       width: 100%;
       border-collapse: collapse;
-      text-align: left;
     }
 
     th, td {
-      padding: 12px;
-      border-bottom: 1px solid #334155;
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
     }
 
     th {
       color: var(--text-muted);
+      font-size: 0.9rem;
     }
 
     .status-operacional {
@@ -141,14 +178,38 @@
 
   <header>
     <h1>PAINEL OPERACIONAL - BSB BRAGA</h1>
-    <div class="status-badge" id="relogio">--:--:--</div>
+    <div class="relogio" id="relogio">--:--:--</div>
   </header>
 
   <div class="grid-container">
-    
-    <!-- QUADRO 1: VIATURAS -->
+
+    <!-- SECCAO TEATRO DE OPERAÇÕES & CANAIS -->
     <div class="card">
-      <h2>Estado das Viaturas</h2>
+      <div class="card-title">Teatro de Operações / Canais</div>
+      
+      <div class="to-card-active">
+        <div class="to-header">
+          <h3 id="to-titulo">Prevenção S.C.Braga</h3>
+          <span class="to-data" id="to-data">2026-12-08 às 18:00</span>
+        </div>
+
+        <div class="to-box-location">
+          <div class="to-local-linha">
+            <span>📍</span>
+            <span id="to-local">Estádio Municipal de Braga</span>
+          </div>
+
+          <div class="to-canal-linha">
+            <span>BSB:</span>
+            <span class="badge-bsb" id="canal-bsb">DMO 01</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCAO VIATURAS -->
+    <div class="card">
+      <div class="card-title">Estado das Viaturas</div>
       <table>
         <thead>
           <tr>
@@ -158,52 +219,20 @@
           </tr>
         </thead>
         <tbody id="tabela-viaturas">
-          <tr>
-            <td colspan="3">A carregar dados das viaturas...</td>
-          </tr>
+          <tr><td colspan="3">A carregar...</td></tr>
         </tbody>
       </table>
-    </div>
-
-    <!-- QUADRO 2: TEATRO DE OPERAÇÕES & CANAIS -->
-    <div class="card">
-      <h2>Teatro de Operações / Canais</h2>
-      <div class="info-list">
-        
-        <div class="info-item">
-          <span class="info-label">Teatro de Operações (TO)</span>
-          <span class="info-value" id="to-local">--</span>
-        </div>
-
-        <div class="info-item">
-          <span class="info-label">Comandante de Operações (COS)</span>
-          <span class="info-value" id="to-cos">--</span>
-        </div>
-
-        <div class="info-item">
-          <span class="info-label">Canal SIRESP Principal</span>
-          <span class="info-value badge-canal" id="canal-siresp">--</span>
-        </div>
-
-        <div class="info-item">
-          <span class="info-label">Outras Frequências / Canais</span>
-          <span class="info-value" id="canais-outros">--</span>
-        </div>
-
-      </div>
     </div>
 
   </div>
 
   <script>
     const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
-    const GID_COMUNICACOES = '1346973124'; // Aba de Canais/TO
+    const GID_COMUNICACOES = '1346973124';
 
-    // URLs dos CSVs do Google Sheets
     const URL_VIATURAS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
     const URL_COMUNICACOES = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_COMUNICACOES}`;
 
-    // Parser manual para converter texto CSV em Objetos JavaScript
     function parseCSV(text) {
       const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
       if (linhas.length < 2) return [];
@@ -237,7 +266,6 @@
       });
     }
 
-    // 1. Atualizar Teatro de Operações e Canais
     async function atualizarTeatroECanais() {
       try {
         const res = await fetch(`${URL_COMUNICACOES}&_t=${Date.now()}`);
@@ -247,17 +275,16 @@
         if (dados.length > 0) {
           const linha = dados[0];
 
-          document.getElementById('to-local').textContent = linha['TO'] || linha['Teatro de Operações'] || 'Sem TO Ativo';
-          document.getElementById('to-cos').textContent = linha['COS'] || linha['Comandante'] || '--';
-          document.getElementById('canal-siresp').textContent = linha['Canais'] || linha['SIRESP'] || linha['Canal'] || '--';
-          document.getElementById('canais-outros').textContent = linha['Frequência'] || linha['Outros'] || '--';
+          document.getElementById('to-titulo').textContent = linha['Evento'] || linha['Ocorrência'] || linha['TO'] || 'Prevenção S.C.Braga';
+          document.getElementById('to-data').textContent = linha['Data'] || linha['Hora'] || 'Sem data definida';
+          document.getElementById('to-local').textContent = linha['Local'] || linha['Teatro de Operações'] || 'Estádio Municipal de Braga';
+          document.getElementById('canal-bsb').textContent = linha['Canais'] || linha['SIRESP'] || linha['Canal'] || 'DMO 01';
         }
       } catch (err) {
         console.error("Erro ao carregar comunicações:", err);
       }
     }
 
-    // 2. Atualizar Lista de Viaturas
     async function atualizarViaturas() {
       try {
         const res = await fetch(`${URL_VIATURAS}&_t=${Date.now()}`);
@@ -287,20 +314,18 @@
       }
     }
 
-    // Relógio Digital
     function atualizarRelogio() {
       const agora = new Date();
       document.getElementById('relogio').textContent = agora.toLocaleTimeString('pt-PT');
     }
 
-    // Inicialização
     function carregarDados() {
       atualizarTeatroECanais();
       atualizarViaturas();
     }
 
-    setInterval(carregarDados, 10000); // Atualiza de 10 em 10 segundos
-    setInterval(atualizarRelogio, 1000); // Relógio a cada segundo
+    setInterval(carregarDados, 10000);
+    setInterval(atualizarRelogio, 1000);
     carregarDados();
     atualizarRelogio();
   </script>
