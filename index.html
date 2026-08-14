@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Batalhão Sapadores Bombeiros de Braga Situação Operacional </title>
-  <style>
+ <style>
     :root {
       --bg-color: #060b17;
       --card-bg: #0f172a;
@@ -13,6 +13,7 @@
       --accent-blue: #0284c7;
       --accent-red: #ef4444;
       --accent-orange: #f97316;
+      --accent-purple: #a855f7;
       --text-main: #ffffff;
       --text-muted: #94a3b8;
     }
@@ -141,6 +142,26 @@
       margin-top: 4px;
     }
 
+    /* CARD OBSERVAÇÕES */
+    .card-observacao {
+      border-left: 4px solid var(--accent-purple);
+    }
+
+    .obs-titulo {
+      font-weight: 700;
+      color: #c084fc;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .obs-texto {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+
     .sem-registos {
       color: var(--text-muted);
       font-style: italic;
@@ -174,16 +195,26 @@
     </div>
   </section>
 
+  <!-- SECCAO 4: OBSERVAÇÕES (GID: 1563121154) -->
+  <section>
+    <div class="seccao-titulo" style="color: var(--accent-purple);">Observações</div>
+    <div class="grid-cards" id="container-observacoes">
+      <div class="card sem-registos">A carregar observações...</div>
+    </div>
+  </section>
+
   <script>
     const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
     
-    // GIDs específicos das abas do Google Sheets
+    // GIDs das abas do Google Sheets
     const GID_TO = '1346973124';          // Aba Teatro de Operações / Canais
     const GID_AGENDAMENTOS = '1209384525';  // Aba Agendamentos
+    const GID_OBSERVACOES = '1563121154';   // Nova Aba de Observações
 
     const URL_VIATURAS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
     const URL_TO = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_TO}`;
     const URL_AGENDAMENTOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_AGENDAMENTOS}`;
+    const URL_OBSERVACOES = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_OBSERVACOES}`;
 
     function parseCSV(text) {
       const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
@@ -256,7 +287,7 @@
       return 'Sem Data/Hora';
     }
 
-    // 1. TEATRO DE OPERAÇÕES / CANAIS (gid=1346973124)
+    // 1. TEATRO DE OPERAÇÕES / CANAIS
     async function carregarTeatroOperacoes() {
       try {
         const res = await fetch(`${URL_TO}&_t=${Date.now()}`);
@@ -266,7 +297,6 @@
         const container = document.getElementById('container-to');
         container.innerHTML = '';
 
-        // FILTRO: Apenas mostra os registos que possuem um canal atribuído válido
         const dadosComCanal = dados.filter(item => {
           const canal = (item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || item['Estado Operacional'] || '').trim();
           return canal !== '' && canal !== '-' && canal.toUpperCase() !== 'N/A';
@@ -281,7 +311,6 @@
           const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || item['Veículo'] || item['Viatura'] || 'Rádio / Canal';
           const local = item['Local'] || item['Localização'] || '';
           const canais = item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || item['Estado Operacional'] || '';
-          const obs = item['Observações'] || item['Obs'] || '';
 
           const div = document.createElement('div');
           div.className = 'card card-to';
@@ -290,7 +319,6 @@
             <div class="to-detalhes">
               ${local ? `<div>📍 <strong>Local:</strong> ${local}</div>` : ''}
               <div>📻 <strong>Canal:</strong> <span class="badge-canal">${canais}</span></div>
-              ${obs ? `<div>📝 <strong>Obs:</strong> ${obs}</div>` : ''}
             </div>
           `;
           container.appendChild(div);
@@ -342,7 +370,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS (gid=1209384525)
+    // 3. AGENDAMENTOS
     async function carregarAgendamentos() {
       try {
         const res = await fetch(`${URL_AGENDAMENTOS}&_t=${Date.now()}`);
@@ -380,10 +408,50 @@
       }
     }
 
+    // 4. OBSERVAÇÕES (Aba GID 1563121154)
+    async function carregarObservacoes() {
+      try {
+        const res = await fetch(`${URL_OBSERVACOES}&_t=${Date.now()}`);
+        const csvTexto = await res.text();
+        const dados = parseCSV(csvTexto);
+
+        const container = document.getElementById('container-observacoes');
+        container.innerHTML = '';
+
+        const listaObs = dados.filter(item => {
+          const obs = (item['Observações'] || item['Observação'] || item['Obs'] || '').trim();
+          const estado = (item['Estado'] || 'Ativo').toUpperCase();
+          return obs !== '' && obs !== '-' && !estado.includes('INATIVO');
+        });
+
+        if (listaObs.length === 0) {
+          container.innerHTML = `<div class="card sem-registos">Sem observações registadas.</div>`;
+          return;
+        }
+
+        listaObs.forEach(item => {
+          const titulo = item['Título'] || item['Titulo'] || '';
+          const obsTexto = item['Observações'] || item['Observação'] || item['Obs'] || '';
+
+          const div = document.createElement('div');
+          div.className = 'card card-observacao';
+          div.innerHTML = `
+            ${titulo ? `<div class="obs-titulo">📌 ${titulo}</div>` : ''}
+            <div class="obs-texto">${obsTexto}</div>
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error("Erro ao carregar observações:", err);
+      }
+    }
+
     function carregarTodosOsDados() {
       carregarTeatroOperacoes();
       carregarViaturasINOP();
       carregarAgendamentos();
+      carregarObservacoes();
     }
 
     setInterval(carregarTodosOsDados, 10000);
