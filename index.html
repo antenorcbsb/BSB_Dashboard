@@ -59,7 +59,7 @@
       position: relative;
     }
 
-    /* CARD TEATRO DE OPERACOES */
+    /* CARD TEATRO DE OPERACOES / CANAIS */
     .card-to {
       border-left: 4px solid var(--accent-green);
     }
@@ -218,14 +218,13 @@
       });
     }
 
-    // Trata e formata valores brutas vindos do Google Sheets como Date(2026,7,15) ou Date(1899,11,30,11,0,0)
     function formatarDataHora(dataValor, horaValor) {
       function extrairComponentes(str) {
         if (!str) return null;
         const match = str.match(/Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/i);
         if (match) {
           const ano = parseInt(match[1]);
-          const mes = parseInt(match[2]) + 1; // Mês no JS/Sheets é 0-indexed
+          const mes = parseInt(match[2]) + 1;
           const dia = parseInt(match[3]);
           const hora = match[4] !== undefined ? parseInt(match[4]) : null;
           const min = match[5] !== undefined ? parseInt(match[5]) : null;
@@ -267,15 +266,21 @@
         const container = document.getElementById('container-to');
         container.innerHTML = '';
 
-        if (dados.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem ocorrências ativas.</div>`;
+        // FILTRO: Apenas mostra os registos que possuem um canal atribuído válido
+        const dadosComCanal = dados.filter(item => {
+          const canal = (item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || item['Estado Operacional'] || '').trim();
+          return canal !== '' && canal !== '-' && canal.toUpperCase() !== 'N/A';
+        });
+
+        if (dadosComCanal.length === 0) {
+          container.innerHTML = `<div class="card sem-registos">Sem canais/rádios atribuídos de momento.</div>`;
           return;
         }
 
-        dados.forEach(item => {
-          const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || 'Ocorrência Ativa';
+        dadosComCanal.forEach(item => {
+          const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || item['Veículo'] || item['Viatura'] || 'Rádio / Canal';
           const local = item['Local'] || item['Localização'] || '';
-          const canais = item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || '';
+          const canais = item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || item['Estado Operacional'] || '';
           const obs = item['Observações'] || item['Obs'] || '';
 
           const div = document.createElement('div');
@@ -284,7 +289,7 @@
             <div class="to-nome">${evento}</div>
             <div class="to-detalhes">
               ${local ? `<div>📍 <strong>Local:</strong> ${local}</div>` : ''}
-              ${canais ? `<div>📻 <strong>Canais:</strong> <span class="badge-canal">${canais}</span></div>` : ''}
+              <div>📻 <strong>Canal:</strong> <span class="badge-canal">${canais}</span></div>
               ${obs ? `<div>📝 <strong>Obs:</strong> ${obs}</div>` : ''}
             </div>
           `;
@@ -381,7 +386,6 @@
       carregarAgendamentos();
     }
 
-    // Atualização automática a cada 10 segundos
     setInterval(carregarTodosOsDados, 10000);
     carregarTodosOsDados();
   </script>
