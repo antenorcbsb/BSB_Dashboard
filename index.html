@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teatro de Operações / Canais</title>
+    <title>Painel Operacional - BSB</title>
     <style>
-        /* Estilos Gerais (Dark Theme do Dashboard) */
+        /* Estilos Gerais (Dark Theme) */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -20,31 +20,35 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
         }
 
-        h2.title {
+        .section-title {
             font-size: 1.1rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #94a3b8;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: 600;
+            border-bottom: 1px solid #1e293b;
+            padding-bottom: 8px;
         }
 
-        /* Container dos Cards */
+        /* 1. SEÇÃO CANAIS / TEATRO DE OPERAÇÕES */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px;
         }
 
-        /* Card Principal do Canal/Viatura */
         .card {
             background-color: #131b2e;
             border: 1px solid #1e293b;
-            border-left: 4px solid #10b981; /* Borda lateral verde */
+            border-left: 4px solid #10b981;
             border-radius: 12px;
             padding: 20px;
             display: flex;
@@ -65,7 +69,6 @@
             margin-top: 4px;
         }
 
-        /* Caixa Interna do PIN (📍) */
         .pin-box {
             background-color: #0b111e;
             border: 1px solid #1e2d4a;
@@ -79,11 +82,6 @@
             font-weight: 500;
         }
 
-        .pin-icon {
-            font-size: 1.1rem;
-        }
-
-        /* Rodapé do Card com o Badge BSB */
         .card-footer {
             display: flex;
             align-items: center;
@@ -99,97 +97,243 @@
             padding: 4px 12px;
             border-radius: 6px;
             font-size: 0.85rem;
+        }
+
+        /* 2. SEÇÃO VEÍCULOS INOPERACIONAIS */
+        .table-container {
+            background-color: #131b2e;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #1e293b;
+            color: #94a3b8;
+            padding: 14px 16px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #1e293b;
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-inop {
+            background-color: #ef4444;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        /* 3. SEÇÃO AGENDAMENTOS */
+        .agendamentos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .agendamento-card {
+            background-color: #131b2e;
+            border: 1px solid #1e293b;
+            border-left: 4px solid #f59e0b;
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .agendamento-data {
+            color: #f59e0b;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .agendamento-titulo {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .agendamento-desc {
+            color: #94a3b8;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2 class="title">Teatro de Operações / Canais</h2>
-
-        <div class="cards-grid">
-            
-            <!-- Card da Viatura ABSC 04 -->
-            <div class="card" id="card-absc04">
-                <div class="card-header">
-                    <h3 id="nome-viatura">ABSC 04 - celeirós</h3>
-                    <p>--</p>
+        
+        <!-- SEÇÃO 1: TEATRO DE OPERAÇÕES / CANAIS -->
+        <section>
+            <h2 class="section-title">Teatro de Operações / Canais</h2>
+            <div class="cards-grid">
+                
+                <div class="card" id="card-absc04">
+                    <div class="card-header">
+                        <h3>ABSC 04 - celeirós</h3>
+                        <p>--</p>
+                    </div>
+                    <div class="pin-box">
+                        <span>📍</span>
+                        <span id="pin-absc04">A carregar...</span>
+                    </div>
+                    <div class="card-footer">
+                        <span>BSB:</span>
+                        <span class="badge-bsb" id="badge-canal">0301Geral</span>
+                    </div>
                 </div>
 
-                <!-- Campo do PIN onde entrará a informação do TO -->
-                <div class="pin-box">
-                    <span class="pin-icon">📍</span>
-                    <span id="pin-absc04">A carregar...</span>
-                </div>
+            </div>
+        </section>
 
-                <div class="card-footer">
-                    <span>BSB:</span>
-                    <span class="badge-bsb" id="badge-canal">0301Geral</span>
+        <!-- SEÇÃO 2: VEÍCULOS INOPERACIONAIS -->
+        <section>
+            <h2 class="section-title">Veículos Inoperacionais (INOP)</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Veículo</th>
+                            <th>Estado</th>
+                            <th>Motivo / Observações</th>
+                            <th>Data Prevista</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-inop">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #64748b;">A carregar veículos inoperacionais...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: AGENDAMENTOS -->
+        <section>
+            <h2 class="section-title">Agendamentos</h2>
+            <div class="agendamentos-grid" id="container-agendamentos">
+                <div class="agendamento-card">
+                    <span class="agendamento-data">--/--/----</span>
+                    <span class="agendamento-titulo">A carregar agendamentos...</span>
+                    <span class="agendamento-desc">--</span>
                 </div>
             </div>
+        </section>
 
-            <!-- Você pode adicionar mais cards aqui se precisar -->
-
-        </div>
     </div>
 
-    <!-- Script de Integração com o Google Sheets -->
+    <!-- SCRIPT DE INTEGRAÇÃO COM GOOGLE SHEETS -->
     <script>
-        // 1. COLI AQUI O ID DA SUA PLANILHA DO GOOGLE SHEETS:
+        // 1. INSIRA O ID DA SUA PLANILHA AQUI:
         const SHEET_ID = 'COLE_AQUI_O_ID_DA_SUA_PLANILHA';
-        
-        // 2. NOME EXATO DA ABA NA PLANILHA (Exemplo: "Canais Radio" ou "Folha1"):
-        const SHEET_NAME = 'Canais Radio';
 
-        async function atualizarDados() {
+        async function carregarAba(nomeAba) {
             try {
-                // Monta a URL da API do Google Sheets
-                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
-
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(nomeAba)}`;
                 const response = await fetch(url);
                 const text = await response.text();
-                
-                // Trata o retorno para converter de texto para JSON
                 const jsonText = text.substring(47, text.length - 2);
-                const data = JSON.parse(jsonText);
-
-                const linhas = data.table.rows;
-
-                // Percorre as linhas da planilha procurando pelos dados
-                linhas.forEach(row => {
-                    // Mapeamento das colunas da planilha (começa em 0):
-                    // row.c[0] = Coluna A (Viatura/Canal)
-                    // row.c[1] = Coluna B (Canal BSB)
-                    // row.c[2] = Coluna C (TO / Informação do PIN)
-                    
-                    const viatura = row.c[0] ? row.c[0].v : '';
-                    const canalBSB = row.c[1] ? row.c[1].v : '0301Geral';
-                    const valorTO = row.c[2] ? row.c[2].v : '--';
-
-                    // Se encontrar a linha correspondente ao ABSC 04
-                    if (viatura.toString().toUpperCase().includes("ABSC 04")) {
-                        // Atualiza o PIN 📍
-                        document.getElementById("pin-absc04").innerText = valorTO || "--";
-                        
-                        // Atualiza o Badge BSB (se existir na planilha)
-                        if (row.c[1]) {
-                            document.getElementById("badge-canal").innerText = canalBSB;
-                        }
-                    }
-                });
-
+                return JSON.parse(jsonText).table.rows;
             } catch (erro) {
-                console.error("Erro ao procurar dados no Google Sheets:", erro);
-                document.getElementById("pin-absc04").innerText = "Erro ao carregar";
+                console.error(`Erro ao carregar a aba ${nomeAba}:`, erro);
+                return [];
             }
         }
 
-        // Executa a função imediatamente ao abrir a página
-        atualizarDados();
+        async function atualizarDashboard() {
+            // === 1. CANAIS / TO ===
+            const linhasCanais = await carregarAba('Canais Radio');
+            linhasCanais.forEach(row => {
+                const viatura = row.c[0] ? row.c[0].v : '';
+                const canalBSB = row.c[1] ? row.c[1].v : '0301Geral';
+                const valorTO = row.c[2] ? row.c[2].v : '--';
 
-        // Atualiza os dados automaticamente a cada 5 segundos
-        setInterval(atualizarDados, 5000);
+                if (viatura.toString().toUpperCase().includes("ABSC 04")) {
+                    document.getElementById("pin-absc04").innerText = valorTO || "--";
+                    if (row.c[1]) document.getElementById("badge-canal").innerText = canalBSB;
+                }
+            });
+
+            // === 2. VEÍCULOS INOPERACIONAIS ===
+            // Espera uma aba chamada "Veiculos" ou "Inoperacionais"
+            const linhasVeiculos = await carregarAba('Veiculos');
+            const tabelaInop = document.getElementById("tabela-inop");
+            
+            let htmlInop = '';
+            linhasVeiculos.forEach(row => {
+                const veiculo = row.c[0] ? row.c[0].v : '';
+                const estado = row.c[1] ? row.c[1].v : '';
+                const motivo = row.c[2] ? row.c[2].v : '--';
+                const dataPrev = row.c[3] ? row.c[3].v : '--';
+
+                // Filtra apenas se for INOP / Inoperacional
+                if (estado.toString().toUpperCase().includes("INOP")) {
+                    htmlInop += `
+                        <tr>
+                            <td><strong>${veiculo}</strong></td>
+                            <td><span class="badge-inop">INOP</span></td>
+                            <td>${motivo}</td>
+                            <td>${dataPrev}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if (htmlInop !== '') {
+                tabelaInop.innerHTML = htmlInop;
+            } else {
+                tabelaInop.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #10b981;">Nenhum veículo inoperacional no momento.</td></tr>`;
+            }
+
+            // === 3. AGENDAMENTOS ===
+            // Espera uma aba chamada "Agendamentos"
+            const linhasAgendamentos = await carregarAba('Agendamentos');
+            const containerAgendamentos = document.getElementById("container-agendamentos");
+            
+            let htmlAgendamentos = '';
+            linhasAgendamentos.forEach(row => {
+                const data = row.c[0] ? row.c[0].v : '';
+                const titulo = row.c[1] ? row.c[1].v : '';
+                const desc = row.c[2] ? row.c[2].v : '';
+
+                if (titulo) {
+                    htmlAgendamentos += `
+                        <div class="agendamento-card">
+                            <span class="agendamento-data">${data}</span>
+                            <span class="agendamento-titulo">${titulo}</span>
+                            <span class="agendamento-desc">${desc}</span>
+                        </div>
+                    `;
+                }
+            });
+
+            if (htmlAgendamentos !== '') {
+                containerAgendamentos.innerHTML = htmlAgendamentos;
+            } else {
+                containerAgendamentos.innerHTML = `<div style="color: #64748b;">Sem agendamentos previstos.</div>`;
+            }
+        }
+
+        // Executa ao abrir e atualiza a cada 10 segundos
+        atualizarDashboard();
+        setInterval(atualizarDashboard, 10000);
     </script>
 </body>
 </html>
