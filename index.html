@@ -69,19 +69,6 @@
             margin-top: 4px;
         }
 
-        .pin-box {
-            background-color: #0b111e;
-            border: 1px solid #1e2d4a;
-            border-radius: 8px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1rem;
-            color: #38bdf8;
-            font-weight: 500;
-        }
-
         .card-footer {
             display: flex;
             align-items: center;
@@ -144,7 +131,7 @@
         /* 3. SEÇÃO AGENDAMENTOS */
         .agendamentos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 15px;
         }
 
@@ -168,11 +155,18 @@
         .agendamento-titulo {
             font-size: 1.05rem;
             font-weight: 600;
+            color: #ffffff;
         }
 
         .agendamento-desc {
             color: #94a3b8;
             font-size: 0.9rem;
+        }
+
+        .agendamento-meta {
+            color: #38bdf8;
+            font-size: 0.8rem;
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -180,7 +174,7 @@
 
     <div class="container">
         
-        <!-- SEÇÃO 1: TEATRO DE OPERAÇÕES / CANAIS -->
+        <!-- SEÇÃO 1: TEATRO DE OPERAÇÕES / CANAIS (SEM O PIN) -->
         <section>
             <h2 class="section-title">Teatro de Operações / Canais</h2>
             <div class="cards-grid">
@@ -189,10 +183,6 @@
                     <div class="card-header">
                         <h3>ABSC 04 - celeirós</h3>
                         <p>--</p>
-                    </div>
-                    <div class="pin-box">
-                        <span>📍</span>
-                        <span id="pin-absc04">A carregar...</span>
                     </div>
                     <div class="card-footer">
                         <span>BSB:</span>
@@ -203,7 +193,7 @@
             </div>
         </section>
 
-        <!-- SEÇÃO 2: VEÍCULOS INOPERACIONAIS -->
+        <!-- SEÇÃO 2: VEÍCULOS INOPERACIONAIS (COM DATA DA AVARIA) -->
         <section>
             <h2 class="section-title">Veículos Inoperacionais (INOP)</h2>
             <div class="table-container">
@@ -213,7 +203,7 @@
                             <th>Veículo</th>
                             <th>Estado</th>
                             <th>Motivo / Observações</th>
-                            <th>Data Prevista</th>
+                            <th>Data Avaria</th>
                         </tr>
                     </thead>
                     <tbody id="tabela-inop">
@@ -225,7 +215,7 @@
             </div>
         </section>
 
-        <!-- SEÇÃO 3: AGENDAMENTOS -->
+        <!-- SEÇÃO 3: AGENDAMENTOS DO GOOGLE SHEETS -->
         <section>
             <h2 class="section-title">Agendamentos</h2>
             <div class="agendamentos-grid" id="container-agendamentos">
@@ -239,9 +229,8 @@
 
     </div>
 
-    <!-- SCRIPT DE INTEGRAÇÃO COM GOOGLE SHEETS -->
+    <!-- SCRIPT DE INTEGRAÇÃO COM O GOOGLE SHEETS (Dashboard_BSB) -->
     <script>
-        // 1. INSIRA O ID DA SUA PLANILHA AQUI:
         const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
 
         async function carregarAba(nomeAba) {
@@ -263,16 +252,13 @@
             linhasCanais.forEach(row => {
                 const viatura = row.c[0] ? row.c[0].v : '';
                 const canalBSB = row.c[1] ? row.c[1].v : '0301Geral';
-                const valorTO = row.c[2] ? row.c[2].v : '--';
 
                 if (viatura.toString().toUpperCase().includes("ABSC 04")) {
-                    document.getElementById("pin-absc04").innerText = valorTO || "--";
                     if (row.c[1]) document.getElementById("badge-canal").innerText = canalBSB;
                 }
             });
 
             // === 2. VEÍCULOS INOPERACIONAIS ===
-            // Espera uma aba chamada "Veiculos" ou "Inoperacionais"
             const linhasVeiculos = await carregarAba('Veiculos');
             const tabelaInop = document.getElementById("tabela-inop");
             
@@ -281,16 +267,15 @@
                 const veiculo = row.c[0] ? row.c[0].v : '';
                 const estado = row.c[1] ? row.c[1].v : '';
                 const motivo = row.c[2] ? row.c[2].v : '--';
-                const dataPrev = row.c[3] ? row.c[3].v : '--';
+                const dataAvaria = row.c[3] ? row.c[3].v : '--';
 
-                // Filtra apenas se for INOP / Inoperacional
                 if (estado.toString().toUpperCase().includes("INOP")) {
                     htmlInop += `
                         <tr>
                             <td><strong>${veiculo}</strong></td>
                             <td><span class="badge-inop">INOP</span></td>
                             <td>${motivo}</td>
-                            <td>${dataPrev}</td>
+                            <td>${dataAvaria}</td>
                         </tr>
                     `;
                 }
@@ -302,23 +287,25 @@
                 tabelaInop.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #10b981;">Nenhum veículo inoperacional no momento.</td></tr>`;
             }
 
-            // === 3. AGENDAMENTOS ===
-            // Espera uma aba chamada "Agendamentos"
+            // === 3. AGENDAMENTOS (Folha "Agendamentos") ===
             const linhasAgendamentos = await carregarAba('Agendamentos');
             const containerAgendamentos = document.getElementById("container-agendamentos");
             
             let htmlAgendamentos = '';
             linhasAgendamentos.forEach(row => {
-                const data = row.c[0] ? row.c[0].v : '';
-                const titulo = row.c[1] ? row.c[1].v : '';
-                const desc = row.c[2] ? row.c[2].v : '';
+                const dataHora = row.c[0] ? row.c[0].v : '';
+                const tipoServico = row.c[1] ? row.c[1].v : '';
+                const descricao = row.c[2] ? row.c[2].v : '';
+                const meios = row.c[3] ? row.c[3].v : '';
+                const responsavel = row.c[4] ? row.c[4].v : '';
 
-                if (titulo) {
+                if (tipoServico || dataHora) {
                     htmlAgendamentos += `
                         <div class="agendamento-card">
-                            <span class="agendamento-data">${data}</span>
-                            <span class="agendamento-titulo">${titulo}</span>
-                            <span class="agendamento-desc">${desc}</span>
+                            <span class="agendamento-data">${dataHora}</span>
+                            <span class="agendamento-titulo">${tipoServico}</span>
+                            <span class="agendamento-desc">${descricao}</span>
+                            ${meios || responsavel ? `<span class="agendamento-meta">${meios ? 'Meios: ' + meios : ''} ${responsavel ? '| Resp: ' + responsavel : ''}</span>` : ''}
                         </div>
                     `;
                 }
@@ -331,7 +318,7 @@
             }
         }
 
-        // Executa ao abrir e atualiza a cada 10 segundos
+        // Executa ao carregar e atualiza a cada 10 segundos
         atualizarDashboard();
         setInterval(atualizarDashboard, 10000);
     </script>
