@@ -38,14 +38,15 @@
             padding-bottom: 8px;
         }
 
-        /* 1. SEÇÃO CANAIS / TEATRO DE OPERAÇÕES */
+        /* Grid Genérico para Quadros */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
         }
 
-        .card {
+        /* 1. SEÇÃO CANAIS / TEATRO DE OPERAÇÕES */
+        .card-canal {
             background-color: #131b2e;
             border: 1px solid #1e293b;
             border-left: 4px solid #10b981;
@@ -86,37 +87,29 @@
             font-size: 0.85rem;
         }
 
-        /* 2. SEÇÃO VEÍCULOS INOPERACIONAIS */
-        .table-container {
+        /* 2. SEÇÃO VEÍCULOS INOPERACIONAIS (EM QUADROS) */
+        .card-inop {
             background-color: #131b2e;
             border: 1px solid #1e293b;
-            border-radius: 12px;
-            overflow: hidden;
+            border-left: 4px solid #ef4444; /* Destaque Vermelho */
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
+        .card-inop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        th {
-            background-color: #1e293b;
-            color: #94a3b8;
-            padding: 14px 16px;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #1e293b;
-            font-size: 0.95rem;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
+        .card-inop-titulo {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
         }
 
         .badge-inop {
@@ -128,22 +121,27 @@
             font-size: 0.8rem;
         }
 
-        /* 3. SEÇÃO AGENDAMENTOS */
-        .agendamentos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
+        .card-inop-motivo {
+            color: #cbd5e1;
+            font-size: 0.95rem;
         }
 
+        .card-inop-data {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        /* 3. SEÇÃO AGENDAMENTOS */
         .agendamento-card {
             background-color: #131b2e;
             border: 1px solid #1e293b;
-            border-left: 4px solid #f59e0b;
+            border-left: 4px solid #f59e0b; /* Destaque Laranja */
             border-radius: 10px;
             padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
         .agendamento-data {
@@ -174,12 +172,11 @@
 
     <div class="container">
         
-        <!-- SEÇÃO 1: TEATRO DE OPERAÇÕES / CANAIS (SEM O PIN) -->
+        <!-- SEÇÃO 1: TEATRO DE OPERAÇÕES / CANAIS -->
         <section>
             <h2 class="section-title">Teatro de Operações / Canais</h2>
             <div class="cards-grid">
-                
-                <div class="card" id="card-absc04">
+                <div class="card-canal" id="card-absc04">
                     <div class="card-header">
                         <h3>ABSC 04 - celeirós</h3>
                         <p>--</p>
@@ -189,47 +186,31 @@
                         <span class="badge-bsb" id="badge-canal">0301Geral</span>
                     </div>
                 </div>
-
             </div>
         </section>
 
-        <!-- SEÇÃO 2: VEÍCULOS INOPERACIONAIS (COM DATA DA AVARIA) -->
+        <!-- SEÇÃO 2: VEÍCULOS INOPERACIONAIS (APRESENTADO EM QUADROS) -->
         <section>
             <h2 class="section-title">Veículos Inoperacionais (INOP)</h2>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Veículo</th>
-                            <th>Estado</th>
-                            <th>Motivo / Observações</th>
-                            <th>Data Avaria</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-inop">
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: #64748b;">A carregar veículos inoperacionais...</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="cards-grid" id="container-inop">
+                <div style="color: #64748b;">A carregar veículos inoperacionais...</div>
             </div>
         </section>
 
-        <!-- SEÇÃO 3: AGENDAMENTOS DO GOOGLE SHEETS -->
+        <!-- SEÇÃO 3: AGENDAMENTOS -->
         <section>
             <h2 class="section-title">Agendamentos</h2>
-            <div class="agendamentos-grid" id="container-agendamentos">
+            <div class="cards-grid" id="container-agendamentos">
                 <div class="agendamento-card">
                     <span class="agendamento-data">--/--/----</span>
                     <span class="agendamento-titulo">A carregar agendamentos...</span>
-                    <span class="agendamento-desc">--</span>
                 </div>
             </div>
         </section>
 
     </div>
 
-    <!-- SCRIPT DE INTEGRAÇÃO COM O GOOGLE SHEETS (Dashboard_BSB) -->
+    <!-- SCRIPT DE INTEGRAÇÃO COM GOOGLE SHEETS -->
     <script>
         const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
 
@@ -258,54 +239,70 @@
                 }
             });
 
-            // === 2. VEÍCULOS INOPERACIONAIS ===
+            // === 2. VEÍCULOS INOPERACIONAIS (QUADROS) ===
             const linhasVeiculos = await carregarAba('Veiculos');
-            const tabelaInop = document.getElementById("tabela-inop");
+            const containerInop = document.getElementById("container-inop");
             
             let htmlInop = '';
             linhasVeiculos.forEach(row => {
                 const veiculo = row.c[0] ? row.c[0].v : '';
                 const estado = row.c[1] ? row.c[1].v : '';
-                const motivo = row.c[2] ? row.c[2].v : '--';
-                const dataAvaria = row.c[3] ? row.c[3].v : '--';
+                const motivo = row.c[2] ? row.c[2].v : 'Sem motivo registado';
+                const dataAvaria = row.c[3] ? row.c[3].v : '';
 
-                if (estado.toString().toUpperCase().includes("INOP")) {
+                // Filtra apenas viaturas INOP
+                if (estado.toString().toUpperCase().includes("INOP") || estado.toString().toUpperCase().includes("INOPERACIONAL")) {
                     htmlInop += `
-                        <tr>
-                            <td><strong>${veiculo}</strong></td>
-                            <td><span class="badge-inop">INOP</span></td>
-                            <td>${motivo}</td>
-                            <td>${dataAvaria}</td>
-                        </tr>
+                        <div class="card-inop">
+                            <div class="card-inop-header">
+                                <span class="card-inop-titulo">${veiculo}</span>
+                                <span class="badge-inop">INOP</span>
+                            </div>
+                            <div class="card-inop-motivo">${motivo}</div>
+                            ${dataAvaria ? `<div class="card-inop-data">Data Avaria: ${dataAvaria}</div>` : ''}
+                        </div>
                     `;
                 }
             });
 
             if (htmlInop !== '') {
-                tabelaInop.innerHTML = htmlInop;
+                containerInop.innerHTML = htmlInop;
             } else {
-                tabelaInop.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #10b981;">Nenhum veículo inoperacional no momento.</td></tr>`;
+                containerInop.innerHTML = `<div style="color: #10b981; padding: 10px;">Nenhum veículo inoperacional no momento.</div>`;
             }
 
-            // === 3. AGENDAMENTOS (Folha "Agendamentos") ===
+            // === 3. AGENDAMENTOS (APENAS AGENDAMENTOS REAIS) ===
             const linhasAgendamentos = await carregarAba('Agendamentos');
             const containerAgendamentos = document.getElementById("container-agendamentos");
             
             let htmlAgendamentos = '';
             linhasAgendamentos.forEach(row => {
-                const dataHora = row.c[0] ? row.c[0].v : '';
-                const tipoServico = row.c[1] ? row.c[1].v : '';
-                const descricao = row.c[2] ? row.c[2].v : '';
-                const meios = row.c[3] ? row.c[3].v : '';
-                const responsavel = row.c[4] ? row.c[4].v : '';
+                const colA = row.c[0] ? row.c[0].v.toString() : '';
+                const colB = row.c[1] ? row.c[1].v.toString() : '';
+                const colC = row.c[2] ? row.c[2].v.toString() : '';
+                const colD = row.c[3] ? row.c[3].v.toString() : '';
+                const colE = row.c[4] ? row.c[4].v.toString() : '';
 
-                if (tipoServico || dataHora) {
+                const linhaCompleta = (colA + ' ' + colB + ' ' + colC).toUpperCase();
+
+                // FILTRO: Ignora cabeçalhos de veículos e listas de viaturas
+                if (
+                    linhaCompleta.includes("VEÍCULO") || 
+                    linhaCompleta.includes("ESTADO OPERACIONAL") || 
+                    linhaCompleta.includes("OBSERVAÇÕES") ||
+                    linhaCompleta.includes("INOPERACIONAL")
+                ) {
+                    return; // Pula esta linha
+                }
+
+                // Renderiza apenas se houver algum conteúdo de agendamento válido
+                if (colA || colB || colC) {
                     htmlAgendamentos += `
                         <div class="agendamento-card">
-                            <span class="agendamento-data">${dataHora}</span>
-                            <span class="agendamento-titulo">${tipoServico}</span>
-                            <span class="agendamento-desc">${descricao}</span>
-                            ${meios || responsavel ? `<span class="agendamento-meta">${meios ? 'Meios: ' + meios : ''} ${responsavel ? '| Resp: ' + responsavel : ''}</span>` : ''}
+                            ${colA ? `<span class="agendamento-data">${colA}</span>` : ''}
+                            ${colB ? `<span class="agendamento-titulo">${colB}</span>` : ''}
+                            ${colC ? `<span class="agendamento-desc">${colC}</span>` : ''}
+                            ${colD || colE ? `<span class="agendamento-meta">${colD ? 'Meios: ' + colD : ''} ${colE ? '| Resp: ' + colE : ''}</span>` : ''}
                         </div>
                     `;
                 }
@@ -314,7 +311,7 @@
             if (htmlAgendamentos !== '') {
                 containerAgendamentos.innerHTML = htmlAgendamentos;
             } else {
-                containerAgendamentos.innerHTML = `<div style="color: #64748b;">Sem agendamentos previstos.</div>`;
+                containerAgendamentos.innerHTML = `<div style="color: #64748b; padding: 10px;">Sem agendamentos previstos.</div>`;
             }
         }
 
