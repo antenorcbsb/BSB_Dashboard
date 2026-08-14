@@ -12,6 +12,7 @@
       --accent-green: #10b981;
       --accent-blue: #0284c7;
       --accent-red: #ef4444;
+      --accent-yellow: #f59e0b;
       --text-main: #ffffff;
       --text-muted: #94a3b8;
     }
@@ -59,8 +60,8 @@
 
     .grid-container {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
     }
 
     .card {
@@ -68,10 +69,12 @@
       padding: 20px;
       border-radius: 14px;
       border: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
     }
 
     .card-title {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--text-muted);
       margin-bottom: 16px;
       text-transform: uppercase;
@@ -79,7 +82,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* ESTILO TEATRO DE OPERAÇÕES */
+    /* TEATRO DE OPERAÇÕES */
     .to-card-active {
       background: linear-gradient(180deg, #1e2d4a 0%, #162238 100%);
       border: 1px solid #2d4268;
@@ -92,20 +95,14 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
-    .to-header {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
     .to-header h3 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       font-weight: 700;
       color: #ffffff;
     }
 
     .to-header .to-data {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
     }
 
@@ -113,10 +110,10 @@
       background-color: rgba(15, 23, 42, 0.6);
       border: 1px solid #2a3d61;
       border-radius: 10px;
-      padding: 14px 16px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
 
     .to-local-linha {
@@ -124,7 +121,7 @@
       align-items: center;
       gap: 8px;
       color: #38bdf8;
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 600;
     }
 
@@ -132,18 +129,52 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: #cbd5e1;
     }
 
     .badge-bsb {
       background-color: var(--accent-blue);
       color: #ffffff;
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: 6px;
       font-weight: 700;
-      font-size: 0.95rem;
-      letter-spacing: 0.5px;
+      font-size: 0.9rem;
+    }
+
+    /* AGENDAMENTOS / PREVENÇÕES */
+    .agendamentos-lista {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .agendamento-item {
+      background-color: #0f172a;
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--accent-yellow);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .agendamento-nome {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .agendamento-data {
+      font-size: 0.85rem;
+      color: var(--accent-yellow);
+      font-weight: 600;
+    }
+
+    .agendamento-local {
+      font-size: 0.9rem;
+      color: var(--text-muted);
     }
 
     /* TABELA DE VIATURAS INOP */
@@ -153,14 +184,14 @@
     }
 
     th, td {
-      padding: 12px 14px;
+      padding: 10px 12px;
       text-align: left;
       border-bottom: 1px solid var(--card-border);
     }
 
     th {
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .status-inop {
@@ -173,7 +204,7 @@
       padding: 20px;
       color: var(--accent-green);
       font-weight: 600;
-      font-size: 1.05rem;
+      font-size: 0.95rem;
     }
   </style>
 </head>
@@ -186,13 +217,13 @@
 
   <div class="grid-container">
 
-    <!-- SECCAO TEATRO DE OPERAÇÕES & CANAIS -->
+    <!-- QUADRO 1: TEATRO DE OPERAÇÕES & CANAIS -->
     <div class="card">
       <div class="card-title">Teatro de Operações / Canais</div>
       
       <div class="to-card-active">
         <div class="to-header">
-          <h3 id="to-titulo">Prevenção S.C.Braga</h3>
+          <h3 id="to-titulo">--</h3>
           <span class="to-data" id="to-data">--</span>
         </div>
 
@@ -210,7 +241,17 @@
       </div>
     </div>
 
-    <!-- SECCAO VIATURAS INOP -->
+    <!-- QUADRO 2: AGENDAMENTOS / PREVENÇÕES -->
+    <div class="card">
+      <div class="card-title" style="color: var(--accent-yellow);">Agendamentos / Prevenções</div>
+      <div class="agendamentos-lista" id="lista-agendamentos">
+        <div class="agendamento-item">
+          <span class="agendamento-nome">A carregar agendamentos...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUADRO 3: VIATURAS INOP -->
     <div class="card">
       <div class="card-title" style="color: var(--accent-red);">Viaturas Inoperacionais (INOP)</div>
       <table>
@@ -231,10 +272,14 @@
 
   <script>
     const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
-    const GID_COMUNICACOES = '1346973124';
+    
+    // GIDs das Abas no Google Sheets (Ajusta os GIDs se estiverem noutros separadores)
+    const GID_COMUNICACOES = '1346973124'; 
+    const GID_AGENDAMENTOS = '1346973124'; // Se for a mesma aba ou altera para o GID correto dos agendamentos
 
     const URL_VIATURAS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
     const URL_COMUNICACOES = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_COMUNICACOES}`;
+    const URL_AGENDAMENTOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_AGENDAMENTOS}`;
 
     function parseCSV(text) {
       const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
@@ -269,6 +314,7 @@
       });
     }
 
+    // 1. TEATRO DE OPERAÇÕES & CANAIS
     async function atualizarTeatroECanais() {
       try {
         const res = await fetch(`${URL_COMUNICACOES}&_t=${Date.now()}`);
@@ -278,7 +324,7 @@
         if (dados.length > 0) {
           const linha = dados[0];
 
-          document.getElementById('to-titulo').textContent = linha['Evento'] || linha['Ocorrência'] || linha['TO'] || 'Sem Ocorrência Activa';
+          document.getElementById('to-titulo').textContent = linha['Evento'] || linha['Ocorrência'] || linha['TO'] || 'Sem Ocorrência Ativa';
           document.getElementById('to-data').textContent = linha['Data'] || linha['Hora'] || '--';
           document.getElementById('to-local').textContent = linha['Local'] || linha['Teatro de Operações'] || '--';
           document.getElementById('canal-bsb').textContent = linha['Canais'] || linha['SIRESP'] || linha['Canal'] || '--';
@@ -288,7 +334,42 @@
       }
     }
 
-    // ATUALIZAÇÃO COM FILTRO PARA Apenas VIATURAS INOP
+    // 2. AGENDAMENTOS / PREVENÇÕES
+    async function atualizarAgendamentos() {
+      try {
+        const res = await fetch(`${URL_AGENDAMENTOS}&_t=${Date.now()}`);
+        const csvTexto = await res.text();
+        const dados = parseCSV(csvTexto);
+
+        const container = document.getElementById('lista-agendamentos');
+        container.innerHTML = '';
+
+        if (dados.length === 0) {
+          container.innerHTML = `<div class="agendamento-item"><span class="agendamento-nome">Sem agendamentos previstos</span></div>`;
+          return;
+        }
+
+        dados.forEach(item => {
+          const nome = item['Evento'] || item['Agendamento'] || item['Serviço'] || 'Prevenção';
+          const dataHora = item['Data'] || item['Hora'] || item['Data/Hora'] || '';
+          const local = item['Local'] || item['Teatro de Operações'] || '';
+
+          const div = document.createElement('div');
+          div.className = 'agendamento-item';
+          div.innerHTML = `
+            <span class="agendamento-nome">${nome}</span>
+            ${dataHora ? `<span class="agendamento-data">📅 ${dataHora}</span>` : ''}
+            ${local ? `<span class="agendamento-local">📍 ${local}</span>` : ''}
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error("Erro ao carregar agendamentos:", err);
+      }
+    }
+
+    // 3. VIATURAS INOP
     async function atualizarViaturas() {
       try {
         const res = await fetch(`${URL_VIATURAS}&_t=${Date.now()}`);
@@ -298,13 +379,11 @@
         const tbody = document.getElementById('tabela-viaturas');
         tbody.innerHTML = '';
 
-        // Filtra apenas as viaturas que têm estado INOP ou INOPERACIONAL
         const viaturasInop = dados.filter(v => {
           const estado = (v['Estado Operacional'] || v['Estado'] || '').toUpperCase();
           return estado.includes('INOP') || estado.includes('INOPERACIONAL');
         });
 
-        // Se não houver nenhuma viatura INOP, mostra mensagem positiva
         if (viaturasInop.length === 0) {
           tbody.innerHTML = `
             <tr>
@@ -315,7 +394,6 @@
           return;
         }
 
-        // Desenha apenas as viaturas INOP
         viaturasInop.forEach(v => {
           const nome = v['Viatura'] || v['Veículo'] || 'N/A';
           const tipo = v['Tipo'] || 'N/A';
@@ -341,6 +419,7 @@
 
     function carregarDados() {
       atualizarTeatroECanais();
+      atualizarAgendamentos();
       atualizarViaturas();
     }
 
