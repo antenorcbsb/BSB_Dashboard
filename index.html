@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Batalhão Sapadores Bombeiros de Braga Situação Operacional </title>
  <style>
-    :root {
+ :root {
       --bg-color: #060b17;
       --card-bg: #0f172a;
       --card-border: #1e293b;
@@ -209,7 +209,7 @@
     // GIDs das abas do Google Sheets
     const GID_TO = '1346973124';          // Aba Teatro de Operações / Canais
     const GID_AGENDAMENTOS = '1209384525';  // Aba Agendamentos
-    const GID_OBSERVACOES = '1563121154';   // Nova Aba de Observações
+    const GID_OBSERVACOES = '1563121154';   // Aba Observações
 
     const URL_VIATURAS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
     const URL_TO = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_TO}`;
@@ -247,6 +247,19 @@
         });
         return obj;
       });
+    }
+
+    function extrairObjetoData(str) {
+      if (!str) return null;
+      const match = str.match(/Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/i);
+      if (match) {
+        return new Date(parseInt(match[1]), parseInt(match[2]), parseInt(match[3]));
+      }
+      const partes = str.split('/');
+      if (partes.length === 3) {
+        return new Date(parseInt(partes[2]), parseInt(partes[1]) - 1, parseInt(partes[0]));
+      }
+      return null;
     }
 
     function formatarDataHora(dataValor, horaValor) {
@@ -370,7 +383,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS
+    // 3. AGENDAMENTOS (Exibe durante todo o dia agendado)
     async function carregarAgendamentos() {
       try {
         const res = await fetch(`${URL_AGENDAMENTOS}&_t=${Date.now()}`);
@@ -380,12 +393,27 @@
         const container = document.getElementById('container-agendamentos');
         container.innerHTML = '';
 
-        if (dados.length === 0) {
-          container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos.</div>`;
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+
+        // Filtra para manter agendamentos do próprio dia (e futuros)
+        const agendamentosAtivos = dados.filter(item => {
+          const dataRaw = item['Data'] || item['Data/Hora'] || '';
+          if (!dataRaw) return true; // Se não houver data explícita, mostra por defeito
+
+          const dataEvento = extrairObjetoData(dataRaw);
+          if (!dataEvento) return true;
+
+          dataEvento.setHours(0, 0, 0, 0);
+          return dataEvento >= hoje; // Mantém visível durante o dia completo
+        });
+
+        if (agendamentosAtivos.length === 0) {
+          container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos para hoje.</div>`;
           return;
         }
 
-        dados.forEach(item => {
+        agendamentosAtivos.forEach(item => {
           const dataRaw = item['Data'] || item['Data/Hora'] || '';
           const horaRaw = item['Hora'] || '';
           const dataHoraFormatada = formatarDataHora(dataRaw, horaRaw);
@@ -408,7 +436,7 @@
       }
     }
 
-    // 4. OBSERVAÇÕES (Aba GID 1563121154)
+    // 4. OBSERVAÇÕES
     async function carregarObservacoes() {
       try {
         const res = await fetch(`${URL_OBSERVACOES}&_t=${Date.now()}`);
