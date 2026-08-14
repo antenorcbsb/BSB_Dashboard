@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Batalhão Sapadores Bombeiros de Braga Situação Operacional </title>
  <style>
- :root {
+:root {
       --bg-color: #060b17;
       --card-bg: #0f172a;
       --card-border: #1e293b;
@@ -383,7 +383,7 @@
       }
     }
 
-    // 3. AGENDAMENTOS (Exibe durante todo o dia agendado)
+    // 3. AGENDAMENTOS (Exibe APENAS no próprio dia)
     async function carregarAgendamentos() {
       try {
         const res = await fetch(`${URL_AGENDAMENTOS}&_t=${Date.now()}`);
@@ -396,16 +396,17 @@
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
 
-        // Filtra para manter agendamentos do próprio dia (e futuros)
+        // Filtra para mostrar APENAS os agendamentos que correspondem ao dia de hoje
         const agendamentosAtivos = dados.filter(item => {
           const dataRaw = item['Data'] || item['Data/Hora'] || '';
-          if (!dataRaw) return true; // Se não houver data explícita, mostra por defeito
+          if (!dataRaw) return false; // Se a data estiver vazia, não mostra
 
           const dataEvento = extrairObjetoData(dataRaw);
-          if (!dataEvento) return true;
+          if (!dataEvento) return false;
 
           dataEvento.setHours(0, 0, 0, 0);
-          return dataEvento >= hoje; // Mantém visível durante o dia completo
+          // A magia acontece aqui: === em vez de >= garante que só mostra no próprio dia
+          return dataEvento.getTime() === hoje.getTime(); 
         });
 
         if (agendamentosAtivos.length === 0) {
