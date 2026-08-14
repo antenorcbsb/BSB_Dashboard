@@ -1,325 +1,389 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Operacional - BSB</title>
-    <style>
-        /* Estilos Gerais (Dark Theme) */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard BSB - Operacional</title>
+  <style>
+    :root {
+      --bg-color: #060b17;
+      --card-bg: #0f172a;
+      --card-border: #1e293b;
+      --accent-green: #10b981;
+      --accent-blue: #0284c7;
+      --accent-red: #ef4444;
+      --accent-orange: #f97316;
+      --text-main: #ffffff;
+      --text-muted: #94a3b8;
+    }
 
-        body {
-            background-color: #0b111e;
-            color: #ffffff;
-            padding: 20px;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
 
-        .section-title {
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #94a3b8;
-            margin-bottom: 15px;
-            font-weight: 600;
-            border-bottom: 1px solid #1e293b;
-            padding-bottom: 8px;
-        }
+    .seccao-titulo {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #38bdf8;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
 
-        /* Grid Genérico para Quadros */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-        }
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
 
-        /* 1. SEÇÃO CANAIS / TEATRO DE OPERAÇÕES */
-        .card-canal {
-            background-color: #131b2e;
-            border: 1px solid #1e293b;
-            border-left: 4px solid #10b981;
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+    }
 
-        .card-header h3 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
+    /* CARD TEATRO DE OPERACOES */
+    .card-to {
+      border-left: 4px solid var(--accent-green);
+    }
 
-        .card-footer {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: #94a3b8;
-        }
+    .to-nome {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
 
-        .badge-bsb {
-            background-color: #0284c7;
-            color: #ffffff;
-            font-weight: 700;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-        }
+    .to-detalhes {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
 
-        /* 2. SEÇÃO VEÍCULOS INOPERACIONAIS (EM QUADROS) */
-        .card-inop {
-            background-color: #131b2e;
-            border: 1px solid #1e293b;
-            border-left: 4px solid #ef4444; /* Destaque Vermelho */
-            border-radius: 10px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
+    .badge-canal {
+      display: inline-block;
+      background-color: var(--accent-blue);
+      color: #fff;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
 
-        .card-inop-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    /* CARD VIATURAS INOP */
+    .card-inop {
+      border-left: 4px solid var(--accent-red);
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .card-inop-titulo {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
+    .inop-info h4 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
 
-        .badge-inop {
-            background-color: #ef4444;
-            color: #ffffff;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-        }
+    .inop-info p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
 
-        .card-inop-motivo {
-            color: #cbd5e1;
-            font-size: 0.95rem;
-        }
+    .badge-inop {
+      background-color: var(--accent-red);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
 
-        .card-inop-data {
-            color: #64748b;
-            font-size: 0.85rem;
-        }
+    /* CARD AGENDAMENTOS */
+    .card-agendamento {
+      border-left: 4px solid var(--accent-orange);
+    }
 
-        /* 3. SEÇÃO AGENDAMENTOS */
-        .agendamento-card {
-            background-color: #131b2e;
-            border: 1px solid #1e293b;
-            border-left: 4px solid #f59e0b; /* Destaque Laranja */
-            border-radius: 10px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
+    .agendamento-data {
+      color: var(--accent-orange);
+      font-weight: 700;
+      font-size: 1rem;
+    }
 
-        .agendamento-data {
-            color: #f59e0b;
-            font-size: 0.85rem;
-            font-weight: 700;
-        }
+    .agendamento-desc {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #ffffff;
+    }
 
-        .agendamento-titulo {
-            font-size: 1.05rem;
-            font-weight: 600;
-            color: #ffffff;
-        }
+    .agendamento-meios {
+      font-size: 0.95rem;
+      color: #38bdf8;
+      font-weight: 600;
+      margin-top: 4px;
+    }
 
-        .agendamento-desc {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-
-        .agendamento-meta {
-            color: #38bdf8;
-            font-size: 0.8rem;
-            margin-top: 4px;
-        }
-    </style>
+    .sem-registos {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 12px;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <!-- SEÇÃO 1: TEATRO DE OPERAÇÕES / CANAIS -->
-        <section>
-            <h2 class="section-title">Teatro de Operações / Canais</h2>
-            <!-- AGORA OS QUADROS SÃO GERADOS AUTOMATICAMENTE PELO SCRIPT -->
-            <div class="cards-grid" id="container-canais">
-                <div style="color: #64748b;">A carregar canais...</div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO 2: VEÍCULOS INOPERACIONAIS -->
-        <section>
-            <h2 class="section-title">Veículos Inoperacionais (INOP)</h2>
-            <div class="cards-grid" id="container-inop">
-                <div style="color: #64748b;">A carregar veículos inoperacionais...</div>
-            </div>
-        </section>
-
-        <!-- SEÇÃO 3: AGENDAMENTOS -->
-        <section>
-            <h2 class="section-title">Agendamentos</h2>
-            <div class="cards-grid" id="container-agendamentos">
-                <div style="color: #64748b;">A carregar agendamentos...</div>
-            </div>
-        </section>
-
+  <!-- SECCAO 1: TEATRO DE OPERAÇÕES / CANAIS (GID: 1346973124) -->
+  <section>
+    <div class="seccao-titulo">Teatro de Operações / Canais</div>
+    <div class="grid-cards" id="container-to">
+      <div class="card sem-registos">A carregar Teatro de Operações...</div>
     </div>
+  </section>
 
-    <!-- SCRIPT DE INTEGRAÇÃO COM GOOGLE SHEETS -->
-    <script>
-        const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
+  <!-- SECCAO 2: VEÍCULOS INOPERACIONAIS (INOP) -->
+  <section>
+    <div class="seccao-titulo" style="color: #f87171;">Veículos Inoperacionais (INOP)</div>
+    <div class="grid-cards" id="container-inop">
+      <div class="card sem-registos">A carregar viaturas INOP...</div>
+    </div>
+  </section>
 
-        async function carregarAba(nomeAba) {
-            try {
-                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(nomeAba)}`;
-                const response = await fetch(url);
-                const text = await response.text();
-                const jsonText = text.substring(47, text.length - 2);
-                return JSON.parse(jsonText).table.rows;
-            } catch (erro) {
-                console.error(`Erro ao carregar a aba ${nomeAba}:`, erro);
-                return [];
-            }
+  <!-- SECCAO 3: AGENDAMENTOS (GID: 1209384525) -->
+  <section>
+    <div class="seccao-titulo" style="color: var(--accent-orange);">Agendamentos</div>
+    <div class="grid-cards" id="container-agendamentos">
+      <div class="card sem-registos">A carregar agendamentos...</div>
+    </div>
+  </section>
+
+  <script>
+    const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
+    
+    // GIDs específicos das abas do Google Sheets
+    const GID_TO = '1346973124';          // Aba Teatro de Operações / Canais
+    const GID_AGENDAMENTOS = '1209384525';  // Aba Agendamentos
+
+    const URL_VIATURAS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+    const URL_TO = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_TO}`;
+    const URL_AGENDAMENTOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_AGENDAMENTOS}`;
+
+    function parseCSV(text) {
+      const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
+      if (linhas.length < 2) return [];
+
+      const parseLinha = (linha) => {
+        const res = [];
+        let cur = '';
+        let dentroAspas = false;
+        for (let i = 0; i < linha.length; i++) {
+          const c = linha[i];
+          if (c === '"') dentroAspas = !dentroAspas;
+          else if (c === ',' && !dentroAspas) {
+            res.push(cur.trim().replace(/^"|"$/g, ''));
+            cur = '';
+          } else {
+            cur += c;
+          }
+        }
+        res.push(cur.trim().replace(/^"|"$/g, ''));
+        return res;
+      };
+
+      const cabecalhos = parseLinha(linhas[0]);
+      return linhas.slice(1).map(linha => {
+        const valores = parseLinha(linha);
+        const obj = {};
+        cabecalhos.forEach((cabecalho, idx) => {
+          obj[cabecalho.trim()] = valores[idx] || '';
+        });
+        return obj;
+      });
+    }
+
+    // Trata e formata valores brutas vindos do Google Sheets como Date(2026,7,15) ou Date(1899,11,30,11,0,0)
+    function formatarDataHora(dataValor, horaValor) {
+      function extrairComponentes(str) {
+        if (!str) return null;
+        const match = str.match(/Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/i);
+        if (match) {
+          const ano = parseInt(match[1]);
+          const mes = parseInt(match[2]) + 1; // Mês no JS/Sheets é 0-indexed
+          const dia = parseInt(match[3]);
+          const hora = match[4] !== undefined ? parseInt(match[4]) : null;
+          const min = match[5] !== undefined ? parseInt(match[5]) : null;
+          return { ano, mes, dia, hora, min };
+        }
+        return null;
+      }
+
+      let dataTexto = '';
+      let horaTexto = '';
+
+      const dObj = extrairComponentes(dataValor);
+      if (dObj && dObj.ano > 1900) {
+        dataTexto = `${String(dObj.dia).padStart(2, '0')}/${String(dObj.mes).padStart(2, '0')}/${dObj.ano}`;
+      } else if (dataValor && !dataValor.includes('Date(')) {
+        dataTexto = dataValor;
+      }
+
+      const hObj = extrairComponentes(horaValor) || extrairComponentes(dataValor);
+      if (hObj && hObj.hora !== null) {
+        horaTexto = `${String(hObj.hora).padStart(2, '0')}:${String(hObj.min).padStart(2, '0')}`;
+      } else if (horaValor && !horaValor.includes('Date(')) {
+        horaTexto = horaValor;
+      }
+
+      if (dataTexto && horaTexto) return `${dataTexto} às ${horaTexto}`;
+      if (dataTexto) return dataTexto;
+      if (horaTexto) return horaTexto;
+      return 'Sem Data/Hora';
+    }
+
+    // 1. TEATRO DE OPERAÇÕES / CANAIS (gid=1346973124)
+    async function carregarTeatroOperacoes() {
+      try {
+        const res = await fetch(`${URL_TO}&_t=${Date.now()}`);
+        const csvTexto = await res.text();
+        const dados = parseCSV(csvTexto);
+
+        const container = document.getElementById('container-to');
+        container.innerHTML = '';
+
+        if (dados.length === 0) {
+          container.innerHTML = `<div class="card sem-registos">Sem ocorrências ativas.</div>`;
+          return;
         }
 
-        async function atualizarDashboard() {
-            // === 1. CANAIS / TO (AGORA TOTALMENTE DINÂMICO) ===
-            // Lendo a folha com o nome exato da imagem: "Canais Rádio"
-            const linhasCanais = await carregarAba('Canais Rádio');
-            const containerCanais = document.getElementById("container-canais");
-            
-            let htmlCanais = '';
-            linhasCanais.forEach(row => {
-                const rede = row.c[0] ? row.c[0].v : '';
-                const canal = row.c[1] ? row.c[1].v : '';
-                const to = row.c[2] ? row.c[2].v : '';
+        dados.forEach(item => {
+          const evento = item['Evento'] || item['Ocorrência'] || item['Teatro de Operações'] || item['TO'] || 'Ocorrência Ativa';
+          const local = item['Local'] || item['Localização'] || '';
+          const canais = item['Canais'] || item['Canal'] || item['SIRESP'] || item['BSB'] || '';
+          const obs = item['Observações'] || item['Obs'] || '';
 
-                // Só cria um quadro se a linha tiver um Canal ou um TO preenchido
-                if (canal || to) {
-                    htmlCanais += `
-                        <div class="card-canal">
-                            <div class="card-header">
-                                <h3>${to || 'Sem Teatro de Operações'}</h3>
-                            </div>
-                            <div class="card-footer">
-                                <span>${rede || 'REDE'}:</span>
-                                <span class="badge-bsb">${canal || '--'}</span>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
+          const div = document.createElement('div');
+          div.className = 'card card-to';
+          div.innerHTML = `
+            <div class="to-nome">${evento}</div>
+            <div class="to-detalhes">
+              ${local ? `<div>📍 <strong>Local:</strong> ${local}</div>` : ''}
+              ${canais ? `<div>📻 <strong>Canais:</strong> <span class="badge-canal">${canais}</span></div>` : ''}
+              ${obs ? `<div>📝 <strong>Obs:</strong> ${obs}</div>` : ''}
+            </div>
+          `;
+          container.appendChild(div);
+        });
 
-            if (htmlCanais !== '') {
-                containerCanais.innerHTML = htmlCanais;
-            } else {
-                containerCanais.innerHTML = `<div style="color: #64748b; padding: 10px;">Nenhum canal ativo no momento.</div>`;
-            }
+      } catch (err) {
+        console.error("Erro ao carregar Teatro de Operações:", err);
+      }
+    }
 
-            // === 2. VEÍCULOS INOPERACIONAIS ===
-            // Lendo a folha com o nome exato da imagem: "Veículos"
-            const linhasVeiculos = await carregarAba('Veículos');
-            const containerInop = document.getElementById("container-inop");
-            
-            let htmlInop = '';
-            linhasVeiculos.forEach(row => {
-                const veiculo = row.c[0] ? row.c[0].v : '';
-                const estado = row.c[1] ? row.c[1].v : '';
-                const motivo = row.c[2] ? row.c[2].v : 'Sem observações';
-                const dataAvaria = row.c[3] ? row.c[3].v : '';
+    // 2. VIATURAS INOP
+    async function carregarViaturasINOP() {
+      try {
+        const res = await fetch(`${URL_VIATURAS}&_t=${Date.now()}`);
+        const csvTexto = await res.text();
+        const dados = parseCSV(csvTexto);
 
-                // Filtra apenas viaturas INOP
-                if (estado.toString().toUpperCase().includes("INOP") || estado.toString().toUpperCase().includes("INOPERACIONAL")) {
-                    htmlInop += `
-                        <div class="card-inop">
-                            <div class="card-inop-header">
-                                <span class="card-inop-titulo">${veiculo}</span>
-                                <span class="badge-inop">INOP</span>
-                            </div>
-                            <div class="card-inop-motivo">${motivo}</div>
-                            ${dataAvaria ? `<div class="card-inop-data">Data Avaria: ${dataAvaria}</div>` : ''}
-                        </div>
-                    `;
-                }
-            });
+        const container = document.getElementById('container-inop');
+        container.innerHTML = '';
 
-            if (htmlInop !== '') {
-                containerInop.innerHTML = htmlInop;
-            } else {
-                containerInop.innerHTML = `<div style="color: #10b981; padding: 10px;">Nenhum veículo inoperacional no momento.</div>`;
-            }
+        const viaturasInop = dados.filter(v => {
+          const estado = (v['Estado Operacional'] || v['Estado'] || '').toUpperCase();
+          return estado.includes('INOP') || estado.includes('INOPERACIONAL');
+        });
 
-            // === 3. AGENDAMENTOS (AGORA NO SINGULAR) ===
-            // Lendo a folha com o nome exato da imagem: "Agendamento"
-            const linhasAgendamentos = await carregarAba('Agendamento');
-            const containerAgendamentos = document.getElementById("container-agendamentos");
-            
-            let htmlAgendamentos = '';
-            linhasAgendamentos.forEach(row => {
-                const colA = row.c[0] ? row.c[0].v.toString() : '';
-                const colB = row.c[1] ? row.c[1].v.toString() : '';
-                const colC = row.c[2] ? row.c[2].v.toString() : '';
-                const colD = row.c[3] ? row.c[3].v.toString() : '';
-                const colE = row.c[4] ? row.c[4].v.toString() : '';
-
-                const linhaCompleta = (colA + ' ' + colB + ' ' + colC).toUpperCase();
-
-                // FILTRO: Ignora cabeçalhos
-                if (linhaCompleta.includes("VEÍCULO") || linhaCompleta.includes("DATA") || linhaCompleta.includes("ESTADO OPERACIONAL")) {
-                    return; // Pula esta linha
-                }
-
-                // Renderiza apenas se houver algum conteúdo de agendamento válido
-                if (colA || colB || colC) {
-                    htmlAgendamentos += `
-                        <div class="agendamento-card">
-                            ${colA ? `<span class="agendamento-data">${colA}</span>` : ''}
-                            ${colB ? `<span class="agendamento-titulo">${colB}</span>` : ''}
-                            ${colC ? `<span class="agendamento-desc">${colC}</span>` : ''}
-                            ${colD || colE ? `<span class="agendamento-meta">${colD ? 'Meios: ' + colD : ''} ${colE ? '| Resp: ' + colE : ''}</span>` : ''}
-                        </div>
-                    `;
-                }
-            });
-
-            if (htmlAgendamentos !== '') {
-                containerAgendamentos.innerHTML = htmlAgendamentos;
-            } else {
-                containerAgendamentos.innerHTML = `<div style="color: #64748b; padding: 10px;">Sem agendamentos previstos.</div>`;
-            }
+        if (viaturasInop.length === 0) {
+          container.innerHTML = `<div class="card sem-registos" style="color: var(--accent-green);">✓ Todas as viaturas estão operacionais.</div>`;
+          return;
         }
 
-        // Executa ao carregar e atualiza a cada 10 segundos
-        atualizarDashboard();
-        setInterval(atualizarDashboard, 10000);
-    </script>
+        viaturasInop.forEach(v => {
+          const nome = v['Viatura'] || v['Veículo'] || 'N/A';
+          const motivo = v['Motivo'] || v['Avaria'] || v['Observações'] || 'Avaria Registada';
+
+          const div = document.createElement('div');
+          div.className = 'card card-inop';
+          div.innerHTML = `
+            <div class="inop-info">
+              <h4>${nome}</h4>
+              <p>${motivo}</p>
+            </div>
+            <span class="badge-inop">INOP</span>
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error("Erro ao carregar viaturas INOP:", err);
+      }
+    }
+
+    // 3. AGENDAMENTOS (gid=1209384525)
+    async function carregarAgendamentos() {
+      try {
+        const res = await fetch(`${URL_AGENDAMENTOS}&_t=${Date.now()}`);
+        const csvTexto = await res.text();
+        const dados = parseCSV(csvTexto);
+
+        const container = document.getElementById('container-agendamentos');
+        container.innerHTML = '';
+
+        if (dados.length === 0) {
+          container.innerHTML = `<div class="card sem-registos">Sem agendamentos previstos.</div>`;
+          return;
+        }
+
+        dados.forEach(item => {
+          const dataRaw = item['Data'] || item['Data/Hora'] || '';
+          const horaRaw = item['Hora'] || '';
+          const dataHoraFormatada = formatarDataHora(dataRaw, horaRaw);
+
+          const descricao = item['Descrição'] || item['Descricao'] || item['Evento'] || item['Serviço'] || 'Agendamento / Prevenção';
+          const meios = item['Meios'] || item['Meios Alocados'] || item['Meios alocados'] || item['Recursos'] || '';
+
+          const div = document.createElement('div');
+          div.className = 'card card-agendamento';
+          div.innerHTML = `
+            <div class="agendamento-data">📅 ${dataHoraFormatada}</div>
+            <div class="agendamento-desc">${descricao}</div>
+            ${meios ? `<div class="agendamento-meios">🚒 Meios: ${meios}</div>` : ''}
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (err) {
+        console.error("Erro ao carregar agendamentos:", err);
+      }
+    }
+
+    function carregarTodosOsDados() {
+      carregarTeatroOperacoes();
+      carregarViaturasINOP();
+      carregarAgendamentos();
+    }
+
+    // Atualização automática a cada 10 segundos
+    setInterval(carregarTodosOsDados, 10000);
+    carregarTodosOsDados();
+  </script>
 </body>
 </html>
