@@ -1,4 +1,4 @@
-<Dashboard BSB html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -142,7 +142,7 @@
       font-size: 0.9rem;
     }
 
-    /* AGENDAMENTOS / PREVENÇÕES */
+    /* AGENDAMENTOS E AVISOS */
     .agendamentos-lista {
       display: flex;
       flex-direction: column;
@@ -157,19 +157,49 @@
       padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
+
+    /* ESTILO DE AVISO QUANDO É HOJE */
+    .agendamento-hoje {
+      border-left: 5px solid var(--accent-red) !important;
+      background-color: rgba(239, 68, 68, 0.12) !important;
+      animation: piscarAlerta 2s infinite alternate;
+    }
+
+    @keyframes piscarAlerta {
+      0% { box-shadow: 0 0 4px rgba(239, 68, 68, 0.3); }
+      100% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.8); }
     }
 
     .agendamento-nome {
       font-size: 1.05rem;
       font-weight: 700;
       color: #ffffff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .badge-aviso-hoje {
+      background-color: var(--accent-red);
+      color: #ffffff;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
     }
 
     .agendamento-data {
       font-size: 0.85rem;
       color: var(--accent-yellow);
       font-weight: 600;
+    }
+
+    .agendamento-hoje .agendamento-data {
+      color: #fca5a5;
     }
 
     .agendamento-local {
@@ -243,7 +273,7 @@
 
     <!-- QUADRO 2: AGENDAMENTOS / PREVENÇÕES -->
     <div class="card">
-      <div class="card-title" style="color: var(--accent-yellow);">Agendamentos / Prevenções</div>
+      <div class="card-title" style="color: var(--accent-yellow);" id="titulo-agendamentos">Agendamentos / Prevenções</div>
       <div class="agendamentos-lista" id="lista-agendamentos">
         <div class="agendamento-item">
           <span class="agendamento-nome">A carregar agendamentos...</span>
@@ -272,10 +302,8 @@
 
   <script>
     const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
-    
-    // GIDs das Abas no Google Sheets (Ajusta os GIDs se estiverem noutros separadores)
     const GID_COMUNICACOES = '1346973124'; 
-    const GID_AGENDAMENTOS = '1346973124'; // Se for a mesma aba ou altera para o GID correto dos agendamentos
+    const GID_AGENDAMENTOS = '1346973124'; // Caso os agendamentos estejam numa aba separada, altera este GID
 
     const URL_VIATURAS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
     const URL_COMUNICACOES = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_COMUNICACOES}`;
@@ -314,6 +342,25 @@
       });
     }
 
+    // Função para verificar se uma data corresponde ao dia de hoje
+    function eHoje(dataStr) {
+      if (!dataStr) return false;
+      
+      const hoje = new Date();
+      const diaHoje = String(hoje.getDate()).padStart(2, '0');
+      const mesHoje = String(hoje.getMonth() + 1).padStart(2, '0');
+      const anoHoje = hoje.getFullYear();
+
+      const str = dataStr.trim();
+
+      // Testa os formatos mais comuns: 2026-12-08 ou 08/12/2026 ou 08-12-2026
+      const padrao1 = `${anoHoje}-${mesHoje}-${diaHoje}`;
+      const padrao2 = `${diaHoje}/${mesHoje}/${anoHoje}`;
+      const padrao3 = `${diaHoje}-${mesHoje}-${anoHoje}`;
+
+      return str.includes(padrao1) || str.includes(padrao2) || str.includes(padrao3);
+    }
+
     // 1. TEATRO DE OPERAÇÕES & CANAIS
     async function atualizarTeatroECanais() {
       try {
@@ -334,7 +381,7 @@
       }
     }
 
-    // 2. AGENDAMENTOS / PREVENÇÕES
+    // 2. AGENDAMENTOS / PREVENÇÕES (COM FILTRO E EMISSÃO DE AVISO)
     async function atualizarAgendamentos() {
       try {
         const res = await fetch(`${URL_AGENDAMENTOS}&_t=${Date.now()}`);
@@ -344,25 +391,50 @@
         const container = document.getElementById('lista-agendamentos');
         container.innerHTML = '';
 
-        if (dados.length === 0) {
-          container.innerHTML = `<div class="agendamento-item"><span class="agendamento-nome">Sem agendamentos previstos</span></div>`;
+        // Filtra apenas agendamentos que têm nome/evento definido
+        const agendamentosGuardados = dados.filter(item => {
+          const nome = item['Evento'] || item['Agendamento'] || item['Serviço'] || item['Ocorrência'];
+          return nome && nome.trim() !== '';
+        });
+
+        if (agendamentosGuardados.length === 0) {
+          container.innerHTML = `<div class="agendamento-item"><span class="agendamento-nome" style="color: var(--text-muted);">Sem agendamentos previstos</span></div>`;
           return;
         }
 
-        dados.forEach(item => {
+        let temAgendamentoHoje = false;
+
+        agendamentosGuardados.forEach(item => {
           const nome = item['Evento'] || item['Agendamento'] || item['Serviço'] || 'Prevenção';
           const dataHora = item['Data'] || item['Hora'] || item['Data/Hora'] || '';
           const local = item['Local'] || item['Teatro de Operações'] || '';
 
+          const isHoje = eHoje(dataHora);
+          if (isHoje) temAgendamentoHoje = true;
+
           const div = document.createElement('div');
-          div.className = 'agendamento-item';
+          div.className = `agendamento-item ${isHoje ? 'agendamento-hoje' : ''}`;
+          
           div.innerHTML = `
-            <span class="agendamento-nome">${nome}</span>
-            ${dataHora ? `<span class="agendamento-data">📅 ${dataHora}</span>` : ''}
-            ${local ? `<span class="agendamento-local">📍 ${local}</span>` : ''}
+            <div class="agendamento-nome">
+              <span>${nome}</span>
+              ${isHoje ? '<span class="badge-aviso-hoje">⚠️ AVISO: É HOJE!</span>' : ''}
+            </div>
+            ${dataHora ? `<div class="agendamento-data">📅 ${dataHora}</div>` : ''}
+            ${local ? `<div class="agendamento-local">📍 ${local}</div>` : ''}
           `;
           container.appendChild(div);
         });
+
+        // Atualiza o título do painel se houver evento para hoje
+        const tituloEl = document.getElementById('titulo-agendamentos');
+        if (temAgendamentoHoje) {
+          tituloEl.style.color = 'var(--accent-red)';
+          tituloEl.textContent = '🚨 AVISO DE AGENDAMENTO (HOJE)';
+        } else {
+          tituloEl.style.color = 'var(--accent-yellow)';
+          tituloEl.textContent = 'Agendamentos / Prevenções';
+        }
 
       } catch (err) {
         console.error("Erro ao carregar agendamentos:", err);
