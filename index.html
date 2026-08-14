@@ -64,12 +64,6 @@
             color: #ffffff;
         }
 
-        .card-header p {
-            color: #64748b;
-            font-size: 0.9rem;
-            margin-top: 4px;
-        }
-
         .card-footer {
             display: flex;
             align-items: center;
@@ -175,21 +169,13 @@
         <!-- SEÇÃO 1: TEATRO DE OPERAÇÕES / CANAIS -->
         <section>
             <h2 class="section-title">Teatro de Operações / Canais</h2>
-            <div class="cards-grid">
-                <div class="card-canal" id="card-absc04">
-                    <div class="card-header">
-                        <h3>ABSC 04 - celeirós</h3>
-                        <p>--</p>
-                    </div>
-                    <div class="card-footer">
-                        <span>BSB:</span>
-                        <span class="badge-bsb" id="badge-canal">0301Geral</span>
-                    </div>
-                </div>
+            <!-- AGORA OS QUADROS SÃO GERADOS AUTOMATICAMENTE PELO SCRIPT -->
+            <div class="cards-grid" id="container-canais">
+                <div style="color: #64748b;">A carregar canais...</div>
             </div>
         </section>
 
-        <!-- SEÇÃO 2: VEÍCULOS INOPERACIONAIS (APRESENTADO EM QUADROS) -->
+        <!-- SEÇÃO 2: VEÍCULOS INOPERACIONAIS -->
         <section>
             <h2 class="section-title">Veículos Inoperacionais (INOP)</h2>
             <div class="cards-grid" id="container-inop">
@@ -201,10 +187,7 @@
         <section>
             <h2 class="section-title">Agendamentos</h2>
             <div class="cards-grid" id="container-agendamentos">
-                <div class="agendamento-card">
-                    <span class="agendamento-data">--/--/----</span>
-                    <span class="agendamento-titulo">A carregar agendamentos...</span>
-                </div>
+                <div style="color: #64748b;">A carregar agendamentos...</div>
             </div>
         </section>
 
@@ -228,26 +211,49 @@
         }
 
         async function atualizarDashboard() {
-            // === 1. CANAIS / TO ===
-            const linhasCanais = await carregarAba('Canais Radio');
+            // === 1. CANAIS / TO (AGORA TOTALMENTE DINÂMICO) ===
+            // Lendo a folha com o nome exato da imagem: "Canais Rádio"
+            const linhasCanais = await carregarAba('Canais Rádio');
+            const containerCanais = document.getElementById("container-canais");
+            
+            let htmlCanais = '';
             linhasCanais.forEach(row => {
-                const viatura = row.c[0] ? row.c[0].v : '';
-                const canalBSB = row.c[1] ? row.c[1].v : '0301Geral';
+                const rede = row.c[0] ? row.c[0].v : '';
+                const canal = row.c[1] ? row.c[1].v : '';
+                const to = row.c[2] ? row.c[2].v : '';
 
-                if (viatura.toString().toUpperCase().includes("ABSC 04")) {
-                    if (row.c[1]) document.getElementById("badge-canal").innerText = canalBSB;
+                // Só cria um quadro se a linha tiver um Canal ou um TO preenchido
+                if (canal || to) {
+                    htmlCanais += `
+                        <div class="card-canal">
+                            <div class="card-header">
+                                <h3>${to || 'Sem Teatro de Operações'}</h3>
+                            </div>
+                            <div class="card-footer">
+                                <span>${rede || 'REDE'}:</span>
+                                <span class="badge-bsb">${canal || '--'}</span>
+                            </div>
+                        </div>
+                    `;
                 }
             });
 
-            // === 2. VEÍCULOS INOPERACIONAIS (QUADROS) ===
-            const linhasVeiculos = await carregarAba('Veiculos');
+            if (htmlCanais !== '') {
+                containerCanais.innerHTML = htmlCanais;
+            } else {
+                containerCanais.innerHTML = `<div style="color: #64748b; padding: 10px;">Nenhum canal ativo no momento.</div>`;
+            }
+
+            // === 2. VEÍCULOS INOPERACIONAIS ===
+            // Lendo a folha com o nome exato da imagem: "Veículos"
+            const linhasVeiculos = await carregarAba('Veículos');
             const containerInop = document.getElementById("container-inop");
             
             let htmlInop = '';
             linhasVeiculos.forEach(row => {
                 const veiculo = row.c[0] ? row.c[0].v : '';
                 const estado = row.c[1] ? row.c[1].v : '';
-                const motivo = row.c[2] ? row.c[2].v : 'Sem motivo registado';
+                const motivo = row.c[2] ? row.c[2].v : 'Sem observações';
                 const dataAvaria = row.c[3] ? row.c[3].v : '';
 
                 // Filtra apenas viaturas INOP
@@ -271,8 +277,9 @@
                 containerInop.innerHTML = `<div style="color: #10b981; padding: 10px;">Nenhum veículo inoperacional no momento.</div>`;
             }
 
-            // === 3. AGENDAMENTOS (APENAS AGENDAMENTOS REAIS) ===
-            const linhasAgendamentos = await carregarAba('Agendamentos');
+            // === 3. AGENDAMENTOS (AGORA NO SINGULAR) ===
+            // Lendo a folha com o nome exato da imagem: "Agendamento"
+            const linhasAgendamentos = await carregarAba('Agendamento');
             const containerAgendamentos = document.getElementById("container-agendamentos");
             
             let htmlAgendamentos = '';
@@ -285,13 +292,8 @@
 
                 const linhaCompleta = (colA + ' ' + colB + ' ' + colC).toUpperCase();
 
-                // FILTRO: Ignora cabeçalhos de veículos e listas de viaturas
-                if (
-                    linhaCompleta.includes("VEÍCULO") || 
-                    linhaCompleta.includes("ESTADO OPERACIONAL") || 
-                    linhaCompleta.includes("OBSERVAÇÕES") ||
-                    linhaCompleta.includes("INOPERACIONAL")
-                ) {
+                // FILTRO: Ignora cabeçalhos
+                if (linhaCompleta.includes("VEÍCULO") || linhaCompleta.includes("DATA") || linhaCompleta.includes("ESTADO OPERACIONAL")) {
                     return; // Pula esta linha
                 }
 
