@@ -1,4 +1,4 @@
-<DashboardBSB html>
+<Dashboard BSB html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
@@ -79,7 +79,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* ESTILO BASEADO NAS FOTOS */
+    /* ESTILO TEATRO DE OPERAÇÕES */
     .to-card-active {
       background: linear-gradient(180deg, #1e2d4a 0%, #162238 100%);
       border: 1px solid #2d4268;
@@ -146,7 +146,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* TABELA DE VIATURAS */
+    /* TABELA DE VIATURAS INOP */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -163,14 +163,17 @@
       font-size: 0.9rem;
     }
 
-    .status-operacional {
-      color: var(--accent-green);
-      font-weight: bold;
-    }
-
     .status-inop {
       color: var(--accent-red);
       font-weight: bold;
+    }
+
+    .sem-inop {
+      text-align: center;
+      padding: 20px;
+      color: var(--accent-green);
+      font-weight: 600;
+      font-size: 1.05rem;
     }
   </style>
 </head>
@@ -190,26 +193,26 @@
       <div class="to-card-active">
         <div class="to-header">
           <h3 id="to-titulo">Prevenção S.C.Braga</h3>
-          <span class="to-data" id="to-data">2026-12-08 às 18:00</span>
+          <span class="to-data" id="to-data">--</span>
         </div>
 
         <div class="to-box-location">
           <div class="to-local-linha">
             <span>📍</span>
-            <span id="to-local">Estádio Municipal de Braga</span>
+            <span id="to-local">--</span>
           </div>
 
           <div class="to-canal-linha">
             <span>BSB:</span>
-            <span class="badge-bsb" id="canal-bsb">DMO 01</span>
+            <span class="badge-bsb" id="canal-bsb">--</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- SECCAO VIATURAS -->
+    <!-- SECCAO VIATURAS INOP -->
     <div class="card">
-      <div class="card-title">Estado das Viaturas</div>
+      <div class="card-title" style="color: var(--accent-red);">Viaturas Inoperacionais (INOP)</div>
       <table>
         <thead>
           <tr>
@@ -275,16 +278,17 @@
         if (dados.length > 0) {
           const linha = dados[0];
 
-          document.getElementById('to-titulo').textContent = linha['Evento'] || linha['Ocorrência'] || linha['TO'] || 'Prevenção S.C.Braga';
-          document.getElementById('to-data').textContent = linha['Data'] || linha['Hora'] || 'Sem data definida';
-          document.getElementById('to-local').textContent = linha['Local'] || linha['Teatro de Operações'] || 'Estádio Municipal de Braga';
-          document.getElementById('canal-bsb').textContent = linha['Canais'] || linha['SIRESP'] || linha['Canal'] || 'DMO 01';
+          document.getElementById('to-titulo').textContent = linha['Evento'] || linha['Ocorrência'] || linha['TO'] || 'Sem Ocorrência Activa';
+          document.getElementById('to-data').textContent = linha['Data'] || linha['Hora'] || '--';
+          document.getElementById('to-local').textContent = linha['Local'] || linha['Teatro de Operações'] || '--';
+          document.getElementById('canal-bsb').textContent = linha['Canais'] || linha['SIRESP'] || linha['Canal'] || '--';
         }
       } catch (err) {
         console.error("Erro ao carregar comunicações:", err);
       }
     }
 
+    // ATUALIZAÇÃO COM FILTRO PARA Apenas VIATURAS INOP
     async function atualizarViaturas() {
       try {
         const res = await fetch(`${URL_VIATURAS}&_t=${Date.now()}`);
@@ -294,18 +298,34 @@
         const tbody = document.getElementById('tabela-viaturas');
         tbody.innerHTML = '';
 
-        dados.forEach(v => {
+        // Filtra apenas as viaturas que têm estado INOP ou INOPERACIONAL
+        const viaturasInop = dados.filter(v => {
+          const estado = (v['Estado Operacional'] || v['Estado'] || '').toUpperCase();
+          return estado.includes('INOP') || estado.includes('INOPERACIONAL');
+        });
+
+        // Se não houver nenhuma viatura INOP, mostra mensagem positiva
+        if (viaturasInop.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="3" class="sem-inop">
+                ✓ Todas as viaturas operacionais
+              </td>
+            </tr>`;
+          return;
+        }
+
+        // Desenha apenas as viaturas INOP
+        viaturasInop.forEach(v => {
           const nome = v['Viatura'] || v['Veículo'] || 'N/A';
           const tipo = v['Tipo'] || 'N/A';
           const estado = (v['Estado Operacional'] || v['Estado'] || '').toUpperCase();
 
           const tr = document.createElement('tr');
-          const estadoClasse = (estado.includes('INOP')) ? 'status-inop' : 'status-operacional';
-
           tr.innerHTML = `
             <td><strong>${nome}</strong></td>
             <td>${tipo}</td>
-            <td class="${estadoClasse}">${estado || 'OPERACIONAL'}</td>
+            <td class="status-inop">${estado}</td>
           `;
           tbody.appendChild(tr);
         });
