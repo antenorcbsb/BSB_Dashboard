@@ -18,6 +18,9 @@
       --accent-purple: #a855f7;
       --text-main: #ffffff;
       --text-muted: #94a3b8;
+      
+      /* Altura do Rodapé para cálculos dinâmicos */
+      --footer-height: 48px;
     }
 
     * {
@@ -27,40 +30,49 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+    }
+
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      padding: 24px;
-      padding-bottom: 70px; /* Espaço para o rodapé IPMA */
+      padding: clamp(12px, 2vw, 24px);
+      /* O padding inferior garante sempre margem suficiente acima do rodapé em qualquer ecrã */
+      padding-bottom: calc(var(--footer-height) + clamp(20px, 3vh, 40px));
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: clamp(12px, 1.8vh, 20px);
     }
 
     .seccao-titulo {
-      font-size: 1.1rem;
+      font-size: clamp(0.85rem, 1.1vw, 1.1rem);
       font-weight: 800;
       letter-spacing: 1px;
       color: #38bdf8;
       text-transform: uppercase;
-      margin-bottom: 12px;
+      margin-bottom: 6px;
     }
 
+    /* Grelha responsiva que calcula automaticamente o tamanho ideal dos cartões */
     .grid-cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+      gap: clamp(10px, 1.2vw, 16px);
     }
 
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 16px 20px;
+      border-radius: 8px;
+      padding: clamp(10px, 1.2vw, 16px);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       position: relative;
+      word-break: break-word; /* Previne estouro de texto longo */
+      overflow-wrap: anywhere;
     }
 
     /* CARD TEATRO DE OPERACOES / CANAIS */
@@ -69,16 +81,17 @@
     }
 
     .to-nome {
-      font-size: 1.25rem;
+      font-size: clamp(0.95rem, 1.15vw, 1.2rem);
       font-weight: 700;
       color: #ffffff;
+      line-height: 1.2;
     }
 
     .to-detalhes {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      font-size: 0.95rem;
+      gap: 4px;
+      font-size: clamp(0.8rem, 0.95vw, 0.95rem);
       color: var(--text-muted);
     }
 
@@ -87,9 +100,9 @@
       background-color: var(--accent-blue);
       color: #fff;
       font-weight: 700;
-      padding: 3px 10px;
+      padding: 2px 8px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: clamp(0.75rem, 0.85vw, 0.85rem);
     }
 
     /* CARD VIATURAS INOP */
@@ -98,27 +111,29 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
     }
 
     .inop-info h4 {
-      font-size: 1.2rem;
+      font-size: clamp(0.95rem, 1.1vw, 1.15rem);
       font-weight: 700;
       color: #ffffff;
     }
 
     .inop-info p {
-      font-size: 0.9rem;
+      font-size: clamp(0.8rem, 0.9vw, 0.9rem);
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     .badge-inop {
       background-color: var(--accent-red);
       color: #ffffff;
       font-weight: 800;
-      font-size: 0.8rem;
-      padding: 4px 10px;
+      font-size: clamp(0.7rem, 0.8vw, 0.8rem);
+      padding: 4px 8px;
       border-radius: 6px;
+      white-space: nowrap;
     }
 
     /* CARD AGENDAMENTOS */
@@ -129,20 +144,21 @@
     .agendamento-data {
       color: var(--accent-orange);
       font-weight: 700;
-      font-size: 1rem;
+      font-size: clamp(0.85rem, 0.95vw, 0.95rem);
     }
 
     .agendamento-desc {
-      font-size: 1.1rem;
+      font-size: clamp(0.95rem, 1.05vw, 1.1rem);
       font-weight: 600;
       color: #ffffff;
+      line-height: 1.3;
     }
 
     .agendamento-meios {
-      font-size: 0.95rem;
+      font-size: clamp(0.8rem, 0.9vw, 0.9rem);
       color: #38bdf8;
       font-weight: 600;
-      margin-top: 4px;
+      margin-top: 2px;
     }
 
     /* CARD OBSERVAÇÕES */
@@ -153,22 +169,23 @@
     .obs-titulo {
       font-weight: 700;
       color: #c084fc;
-      font-size: 0.95rem;
+      font-size: clamp(0.8rem, 0.9vw, 0.9rem);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .obs-texto {
-      font-size: 1.05rem;
+      font-size: clamp(0.9rem, 1vw, 1.05rem);
       font-weight: 600;
       color: #ffffff;
-      line-height: 1.4;
+      line-height: 1.35;
     }
 
     .sem-registos {
       color: var(--text-muted);
       font-style: italic;
-      padding: 12px;
+      padding: 10px;
+      font-size: clamp(0.85rem, 0.95vw, 0.95rem);
     }
 
     /* BARRA RODAPÉ IPMA (TICKER) */
@@ -177,7 +194,7 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 48px;
+      height: var(--footer-height);
       background-color: #0f172a;
       color: #ffffff;
       display: flex;
@@ -186,21 +203,21 @@
       box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
       z-index: 9999;
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: clamp(0.8rem, 0.9vw, 0.95rem);
       border-top: 2px solid var(--accent-blue);
     }
 
     .ticker-label {
       background-color: var(--accent-blue);
       color: #ffffff;
-      padding: 0 18px;
+      padding: 0 clamp(10px, 1.5vw, 18px);
       height: 100%;
       display: flex;
       align-items: center;
       gap: 8px;
       white-space: nowrap;
       z-index: 2;
-      font-size: 0.85rem;
+      font-size: clamp(0.75rem, 0.85vw, 0.85rem);
       letter-spacing: 1px;
     }
 
@@ -236,7 +253,7 @@
       font-weight: 800;
       margin-left: 6px;
       text-transform: uppercase;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
 
     @keyframes ticker-animacao {
@@ -246,6 +263,24 @@
 
     .rodape-ticker:hover .ticker-texto {
       animation-play-state: paused;
+    }
+
+    /* OTIMIZAÇÃO PARA ECRÃS DE TV / GRANDES MONITORES (4K / FULL HD) */
+    @media (min-width: 1920px) {
+      .grid-cards {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+    }
+
+    /* OTIMIZAÇÃO PARA DISPOSITIVOS MÓVEIS */
+    @media (max-width: 600px) {
+      body {
+        padding: 12px;
+        padding-bottom: calc(var(--footer-height) + 20px);
+      }
+      .grid-cards {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
