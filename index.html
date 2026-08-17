@@ -18,9 +18,6 @@
       --accent-purple: #a855f7;
       --text-main: #ffffff;
       --text-muted: #94a3b8;
-      
-      /* Altura do Rodapé para cálculos dinâmicos */
-      --footer-height: 48px;
     }
 
     * {
@@ -30,49 +27,60 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
+    /* Trava o ecrã para evitar qualquer barra de scroll */
     html, body {
-      width: 100%;
-      min-height: 100vh;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
     }
 
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      padding: clamp(12px, 2vw, 24px);
-      /* O padding inferior garante sempre margem suficiente acima do rodapé em qualquer ecrã */
-      padding-bottom: calc(var(--footer-height) + clamp(20px, 3vh, 40px));
+      padding: clamp(8px, 1.2vh, 16px);
+      padding-bottom: 0;
       display: flex;
       flex-direction: column;
-      gap: clamp(12px, 1.8vh, 20px);
+      gap: clamp(6px, 1vh, 12px);
+    }
+
+    /* Cada secção divide a altura do ecrã proporcionalmente */
+    section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0; /* Essencial para permitir o encolhimento flex no CSS */
     }
 
     .seccao-titulo {
-      font-size: clamp(0.85rem, 1.1vw, 1.1rem);
+      font-size: clamp(0.75rem, 1.2vh, 0.95rem);
       font-weight: 800;
       letter-spacing: 1px;
       color: #38bdf8;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
+      flex-shrink: 0;
     }
 
-    /* Grelha responsiva que calcula automaticamente o tamanho ideal dos cartões */
     .grid-cards {
+      flex: 1;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-      gap: clamp(10px, 1.2vw, 16px);
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+      gap: clamp(6px, 1vw, 10px);
+      min-height: 0;
     }
 
     .card {
       background-color: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: clamp(10px, 1.2vw, 16px);
+      border-radius: 6px;
+      padding: clamp(6px, 1vh, 10px);
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      justify-content: center;
+      gap: 4px;
       position: relative;
-      word-break: break-word; /* Previne estouro de texto longo */
-      overflow-wrap: anywhere;
+      overflow: hidden;
     }
 
     /* CARD TEATRO DE OPERACOES / CANAIS */
@@ -81,17 +89,19 @@
     }
 
     .to-nome {
-      font-size: clamp(0.95rem, 1.15vw, 1.2rem);
+      font-size: clamp(0.85rem, 1.3vh, 1.05rem);
       font-weight: 700;
       color: #ffffff;
-      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .to-detalhes {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      font-size: clamp(0.8rem, 0.95vw, 0.95rem);
+      gap: 2px;
+      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
       color: var(--text-muted);
     }
 
@@ -100,9 +110,9 @@
       background-color: var(--accent-blue);
       color: #fff;
       font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: clamp(0.75rem, 0.85vw, 0.85rem);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: clamp(0.7rem, 1vh, 0.8rem);
     }
 
     /* CARD VIATURAS INOP */
@@ -111,29 +121,37 @@
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+    }
+
+    .inop-info {
+      overflow: hidden;
     }
 
     .inop-info h4 {
-      font-size: clamp(0.95rem, 1.1vw, 1.15rem);
+      font-size: clamp(0.85rem, 1.3vh, 1rem);
       font-weight: 700;
       color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .inop-info p {
-      font-size: clamp(0.8rem, 0.9vw, 0.9rem);
+      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
       color: var(--text-muted);
-      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .badge-inop {
       background-color: var(--accent-red);
       color: #ffffff;
       font-weight: 800;
-      font-size: clamp(0.7rem, 0.8vw, 0.8rem);
-      padding: 4px 8px;
-      border-radius: 6px;
-      white-space: nowrap;
+      font-size: clamp(0.65rem, 1vh, 0.75rem);
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
     }
 
     /* CARD AGENDAMENTOS */
@@ -144,21 +162,25 @@
     .agendamento-data {
       color: var(--accent-orange);
       font-weight: 700;
-      font-size: clamp(0.85rem, 0.95vw, 0.95rem);
+      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
     }
 
     .agendamento-desc {
-      font-size: clamp(0.95rem, 1.05vw, 1.1rem);
+      font-size: clamp(0.85rem, 1.2vh, 0.95rem);
       font-weight: 600;
       color: #ffffff;
-      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .agendamento-meios {
-      font-size: clamp(0.8rem, 0.9vw, 0.9rem);
+      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
       color: #38bdf8;
       font-weight: 600;
-      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* CARD OBSERVAÇÕES */
@@ -169,32 +191,30 @@
     .obs-titulo {
       font-weight: 700;
       color: #c084fc;
-      font-size: clamp(0.8rem, 0.9vw, 0.9rem);
+      font-size: clamp(0.7rem, 1vh, 0.8rem);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
 
     .obs-texto {
-      font-size: clamp(0.9rem, 1vw, 1.05rem);
+      font-size: clamp(0.8rem, 1.2vh, 0.95rem);
       font-weight: 600;
       color: #ffffff;
-      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .sem-registos {
       color: var(--text-muted);
       font-style: italic;
-      padding: 10px;
-      font-size: clamp(0.85rem, 0.95vw, 0.95rem);
+      padding: 6px;
+      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
     }
 
     /* BARRA RODAPÉ IPMA (TICKER) */
     .rodape-ticker {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: var(--footer-height);
+      height: clamp(36px, 5vh, 44px);
       background-color: #0f172a;
       color: #ffffff;
       display: flex;
@@ -203,22 +223,25 @@
       box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
       z-index: 9999;
       font-weight: 700;
-      font-size: clamp(0.8rem, 0.9vw, 0.95rem);
+      font-size: clamp(0.75rem, 1.1vh, 0.85rem);
       border-top: 2px solid var(--accent-blue);
+      flex-shrink: 0;
+      margin-left: calc(-1 * clamp(8px, 1.2vh, 16px));
+      margin-right: calc(-1 * clamp(8px, 1.2vh, 16px));
     }
 
     .ticker-label {
       background-color: var(--accent-blue);
       color: #ffffff;
-      padding: 0 clamp(10px, 1.5vw, 18px);
+      padding: 0 12px;
       height: 100%;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       white-space: nowrap;
       z-index: 2;
-      font-size: clamp(0.75rem, 0.85vw, 0.85rem);
-      letter-spacing: 1px;
+      font-size: clamp(0.7rem, 1vh, 0.8rem);
+      letter-spacing: 0.5px;
     }
 
     .ticker-conteudo {
@@ -238,49 +261,27 @@
     .ticker-item {
       display: inline-flex;
       align-items: center;
-      margin-right: 40px;
+      margin-right: 30px;
     }
 
     .ticker-separador {
-      margin-left: 40px;
+      margin-left: 30px;
       color: #38bdf8;
       opacity: 0.7;
     }
 
     .badge-perigo {
-      padding: 2px 8px;
+      padding: 2px 6px;
       border-radius: 4px;
       font-weight: 800;
       margin-left: 6px;
       text-transform: uppercase;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
     }
 
     @keyframes ticker-animacao {
       0% { transform: translate3d(0, 0, 0); }
       100% { transform: translate3d(-100%, 0, 0); }
-    }
-
-    .rodape-ticker:hover .ticker-texto {
-      animation-play-state: paused;
-    }
-
-    /* OTIMIZAÇÃO PARA ECRÃS DE TV / GRANDES MONITORES (4K / FULL HD) */
-    @media (min-width: 1920px) {
-      .grid-cards {
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      }
-    }
-
-    /* OTIMIZAÇÃO PARA DISPOSITIVOS MÓVEIS */
-    @media (max-width: 600px) {
-      body {
-        padding: 12px;
-        padding-bottom: calc(var(--footer-height) + 20px);
-      }
-      .grid-cards {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
 </head>
