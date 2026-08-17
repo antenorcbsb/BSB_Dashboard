@@ -1,11 +1,13 @@
-<BSB Dashboard html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Batalhão Sapadores Bombeiros de Braga Situação Operacional </title>
- <style>
-:root {
+  <title>Batalhão Sapadores Bombeiros de Braga - Situação Operacional</title>
+  <!-- Ícones Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
       --bg-color: #060b17;
       --card-bg: #0f172a;
       --card-border: #1e293b;
@@ -29,6 +31,7 @@
       background-color: var(--bg-color);
       color: var(--text-main);
       padding: 24px;
+      padding-bottom: 70px; /* Espaço para o rodapé IPMA */
       display: flex;
       flex-direction: column;
       gap: 24px;
@@ -167,6 +170,83 @@
       font-style: italic;
       padding: 12px;
     }
+
+    /* BARRA RODAPÉ IPMA (TICKER) */
+    .rodape-ticker {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 48px;
+      background-color: #0f172a;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border-top: 2px solid var(--accent-blue);
+    }
+
+    .ticker-label {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      padding: 0 18px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      z-index: 2;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+    }
+
+    .ticker-conteudo {
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .ticker-texto {
+      display: inline-block;
+      white-space: nowrap;
+      padding-left: 100%;
+      animation: ticker-animacao 25s linear infinite;
+    }
+
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      margin-right: 40px;
+    }
+
+    .ticker-separador {
+      margin-left: 40px;
+      color: #38bdf8;
+      opacity: 0.7;
+    }
+
+    .badge-perigo {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 800;
+      margin-left: 6px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    @keyframes ticker-animacao {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    .rodape-ticker:hover .ticker-texto {
+      animation-play-state: paused;
+    }
   </style>
 </head>
 <body>
@@ -203,6 +283,18 @@
     </div>
   </section>
 
+  <!-- RODAPÉ METEOROLÓGICO IPMA -->
+  <footer class="rodape-ticker">
+    <div class="ticker-label">
+      <i class="fa-solid fa-cloud-sun"></i> IPMA BRAGA
+    </div>
+    <div class="ticker-conteudo">
+      <div class="ticker-texto" id="ticker-texto">
+        <span class="ticker-item">A obter dados oficiais do IPMA...</span>
+      </div>
+    </div>
+  </footer>
+
   <script>
     const SHEET_ID = '1ma86jNoDbIG9acIgHx6imCPWWjKVZ-ka3k1mF61BtXo';
     
@@ -215,6 +307,80 @@
     const URL_TO = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_TO}`;
     const URL_AGENDAMENTOS = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_AGENDAMENTOS}`;
     const URL_OBSERVACOES = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID_OBSERVACOES}`;
+
+    // API ENDPOINTS DO IPMA
+    const URL_IPMA_METEO = 'https://api.ipma.pt/open-data/forecast/meteorology/cities/daily/1030300.json'; // Braga
+    const URL_IPMA_TIPOS = 'https://api.ipma.pt/open-data/weather-type-classe.json';                      // Tipos de tempo
+    const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';          // Perigo de Incêndio Rural
+    const DICO_BRAGA = '0303'; // Código DICO do Concelho de Braga
+
+    // Mapeamento dos níveis de Risco de Incêndio Rural (RCM)
+    function obterNivelPerigoIncendio(rcmVal) {
+      const niveis = {
+        1: { texto: 'Reduzido', bg: '#10b981', color: '#ffffff', icone: '🟢' },
+        2: { texto: 'Moderado', bg: '#eab308', color: '#000000', icone: '🟡' },
+        3: { texto: 'Elevado', bg: '#f97316', color: '#ffffff', icone: '🟠' },
+        4: { texto: 'Muito Elevado', bg: '#ef4444', color: '#ffffff', icone: '🔴' },
+        5: { texto: 'Máximo', bg: '#a855f7', color: '#ffffff', icone: '🟣' }
+      };
+      return niveis[rcmVal] || { texto: 'N/A', bg: '#64748b', color: '#ffffff', icone: '⚪' };
+    }
+
+    async function carregarMeteoIPMA() {
+      const containerTicker = document.getElementById('ticker-texto');
+      if (!containerTicker) return;
+
+      try {
+        const [resMeteo, resTipos, resRcm] = await Promise.all([
+          fetch(URL_IPMA_METEO),
+          fetch(URL_IPMA_TIPOS),
+          fetch(URL_IPMA_RCM).catch(() => null)
+        ]);
+
+        if (!resMeteo.ok || !resTipos.ok) throw new Error("Erro ao consultar a API do IPMA");
+
+        const dataMeteo = await resMeteo.json();
+        const dataTipos = await resTipos.json();
+
+        // 1. Dados de temperatura e estado do tempo de hoje
+        const previsaoHoje = dataMeteo.data[0];
+        const tMin = Math.round(previsaoHoje.tMin);
+        const tMax = Math.round(previsaoHoje.tMax);
+        const probChuva = previsaoHoje.precipitaProb;
+        const idTipoTempo = previsaoHoje.idWeatherType;
+
+        const tipoObjeto = dataTipos.data.find(t => t.idWeatherType === idTipoTempo);
+        const descTempo = tipoObjeto ? tipoObjeto.descWeatherTypePT : 'Tempo Variável';
+
+        // 2. Dados de Perigo de Incêndio Rural (RCM) para o concelho de Braga
+        let perigoIncendioHTML = '🔥 <strong>Perigo Incêndio Rural:</strong> N/A';
+        if (resRcm && resRcm.ok) {
+          const dataRcm = await resRcm.json();
+          const dataChave = Object.keys(dataRcm)[0];
+          if (dataChave && dataRcm[dataChave] && dataRcm[dataChave][DICO_BRAGA]) {
+            const rcmVal = dataRcm[dataChave][DICO_BRAGA].rcm;
+            const infoRcm = obterNivelPerigoIncendio(rcmVal);
+            perigoIncendioHTML = `🔥 <strong>Perigo Incêndio Rural:</strong> ${infoRcm.icone} <span class="badge-perigo" style="background-color: ${infoRcm.bg}; color: ${infoRcm.color};">${infoRcm.texto}</span>`;
+          }
+        }
+
+        // 3. Montar barra de informações
+        const mensagens = [
+          `📍 <strong>Braga (IPMA):</strong> ${descTempo}`,
+          `🌡️ <strong>Máx / Mín Hoje:</strong> ${tMax}°C / ${tMin}°C`,
+          `🌧️ <strong>Prob. de Chuva:</strong> ${probChuva}%`,
+          perigoIncendioHTML
+        ];
+
+        containerTicker.innerHTML = mensagens
+          .map(msg => `<span class="ticker-item">${msg}</span>`)
+          .join('<span class="ticker-separador">✦</span>');
+
+      } catch (err) {
+        console.error("Erro ao carregar IPMA:", err);
+        containerTicker.innerHTML = `<span class="ticker-item">⚠️ Impossível obter os dados do IPMA de momento.</span>`;
+      }
+    }
 
     function parseCSV(text) {
       const linhas = text.split(/\r?\n/).filter(l => l.trim() !== '');
@@ -396,16 +562,14 @@
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
 
-        // Filtra para mostrar APENAS os agendamentos que correspondem ao dia de hoje
         const agendamentosAtivos = dados.filter(item => {
           const dataRaw = item['Data'] || item['Data/Hora'] || '';
-          if (!dataRaw) return false; // Se a data estiver vazia, não mostra
+          if (!dataRaw) return false;
 
           const dataEvento = extrairObjetoData(dataRaw);
           if (!dataEvento) return false;
 
           dataEvento.setHours(0, 0, 0, 0);
-          // A magia acontece aqui: === em vez de >= garante que só mostra no próprio dia
           return dataEvento.getTime() === hoje.getTime(); 
         });
 
@@ -481,6 +645,7 @@
       carregarViaturasINOP();
       carregarAgendamentos();
       carregarObservacoes();
+      carregarMeteoIPMA();
     }
 
     setInterval(carregarTodosOsDados, 10000);
