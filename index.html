@@ -132,15 +132,24 @@
       flex: 1;
     }
 
-    .inop-img {
-      width: clamp(36px, 3.5vw, 52px);
-      height: clamp(36px, 3.5vw, 52px);
-      object-fit: contain;
-      background-color: rgba(255, 255, 255, 0.05);
+    /* Contentor do Ícone/SVG do Veículo */
+    .inop-icon-box {
+      width: clamp(38px, 3.8vw, 48px);
+      height: clamp(38px, 3.8vw, 48px);
+      background-color: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
       border-radius: 6px;
-      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px;
+    }
+
+    .inop-icon-box svg {
+      width: 100%;
+      height: 100%;
+      fill: var(--accent-red);
     }
 
     .inop-info {
@@ -370,33 +379,33 @@
     const URL_IPMA_RCM = 'https://api.ipma.pt/open-data/forecast/meteorology/rcm/rcm-dico.json';          // Perigo de Incêndio Rural
     const DICO_BRAGA = '0303'; // Código DICO do Concelho de Braga
 
-    // Função para identificar o ícone/imagem vetorial da viatura com base no tipo/nome
-    function obterImagemViatura(nomeViatura) {
+    // Função que devolve o HTML SVG inline de acordo com o tipo de viatura
+    function obterSVGSimboloViatura(nomeViatura) {
       const nomeUpper = nomeViatura.toUpperCase();
 
       // Ambulância (ABSC / AMB)
-      if (nomeUpper.includes('ABSC') || nomeUpper.includes('AMBUL')) {
-        return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="4" y="20" width="56" height="28" rx="4" fill="%23ffffff"/><path d="M44 20 L56 20 L60 32 L60 48 L44 48 Z" fill="%23e2e8f0"/><rect x="28" y="26" width="12" height="4" fill="%23ef4444"/><rect x="32" y="22" width="4" height="12" fill="%23ef4444"/><circle cx="16" cy="48" r="6" fill="%231e293b"/><circle cx="48" cy="48" r="6" fill="%231e293b"/><circle cx="16" cy="48" r="2" fill="%2394a3b8"/><circle cx="48" cy="48" r="2" fill="%2394a3b8"/></svg>';
+      if (nomeUpper.includes('ABSC') || nomeUpper.includes('AMBUL') || nomeUpper.includes('ABSU')) {
+        return `<svg viewBox="0 0 24 24"><path d="M19 8h-2V5c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h1c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h1c1.1 0 2-.9 2-2v-5l-3-4zM7 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-6.5H9v2H7v-2H5v-2h2V8h2v2h2v2zm7 6.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1-5.5h-3.5V8.5H17l2 2.5v3z"/></svg>`;
       }
       // Veículos Florestais / Rurais (VFCI / VTTU)
       if (nomeUpper.includes('VFCI') || nomeUpper.includes('VTTU')) {
-        return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="M6 24 L42 24 L56 34 L56 46 L6 46 Z" fill="%23ef4444"/><rect x="10" y="16" width="24" height="8" fill="%23b91c1c"/><rect x="38" y="28" width="12" height="8" fill="%2338bdf8"/><circle cx="18" cy="46" r="7" fill="%230f172a"/><circle cx="44" cy="46" r="7" fill="%230f172a"/><circle cx="18" cy="46" r="3" fill="%2394a3b8"/><circle cx="44" cy="46" r="3" fill="%2394a3b8"/></svg>';
+        return `<svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5C5.17 18.5 4.5 17.83 4.5 17s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm12 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM17 12V9.5h1.5l1.5 2.5H17zM12 3l-2 3h1.5v3h1V6H14L12 3z"/></svg>`;
       }
-      // Veículos Urbanos / Industriais (VLCI / VECI)
-      if (nomeUpper.includes('VLCI') || nomeUpper.includes('VECI')) {
-        return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="4" y="18" width="56" height="28" rx="3" fill="%23ef4444"/><rect x="10" y="24" width="12" height="10" fill="%23cbd5e1"/><rect x="26" y="24" width="12" height="10" fill="%23cbd5e1"/><rect x="44" y="22" width="12" height="8" fill="%2338bdf8"/><circle cx="16" cy="46" r="6" fill="%231e293b"/><circle cx="48" cy="46" r="6" fill="%231e293b"/></svg>';
+      // Veículos Urbanos / Industriais (VLCI / VECI / VACB)
+      if (nomeUpper.includes('VLCI') || nomeUpper.includes('VECI') || nomeUpper.includes('VACB')) {
+        return `<svg viewBox="0 0 24 24"><path d="M22 12v5c0 1.1-.9 2-2 2h-1c0 1.66-1.34 3-3 3s-3-1.34-3-3H9c0 1.66-1.34 3-3 3S3 20.66 3 19H2v-7c0-1.1.9-2 2-2h12l3-5h3c1.1 0 2 .9 2 2v3zM6 19.5c.83 0 1.5-.67 1.5-1.5S6.83 16.5 6 16.5 4.5 17.17 4.5 18s.67 1.5 1.5 1.5zm10 0c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM18 10h2.5l-1.8-3H18v3zM4 12v3h6v-3H4zm8 0v3h4v-3h-4z"/></svg>`;
       }
-      // Tanques / Grandes Capacidades (VTTG / VTAA)
+      // Tanques / Grandes Capacidades (VTTG / VTAA / TANQUE)
       if (nomeUpper.includes('VTTG') || nomeUpper.includes('VTAA') || nomeUpper.includes('TANQUE')) {
-        return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="4" y="22" width="38" height="22" rx="8" fill="%23f97316"/><rect x="40" y="22" width="18" height="22" fill="%23ef4444"/><circle cx="14" cy="44" r="6" fill="%230f172a"/><circle cx="28" cy="44" r="6" fill="%230f172a"/><circle cx="48" cy="44" r="6" fill="%230f172a"/></svg>';
+        return `<svg viewBox="0 0 24 24"><path d="M18 7c-1.1 0-2 .9-2 2v1H2v7c0 1.1.9 2 2 2h1c0 1.66 1.34 3 3 3s3-1.34 3-3h4c0 1.66 1.34 3 3 3s3-1.34 3-3h2c1.1 0 2-.9 2-2v-5l-2-2h-2zm-10 12c-.83 0-1.5-.67-1.5-1.5S7.17 16 8 16s1.5.67 1.5 1.5S8.83 19 8 19zm8 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm2-5.5V11h1.5l1 2.5H18z"/></svg>`;
       }
-      // Plataforma / Escada Escada (VP / VE)
+      // Escada / Plataforma (VP / VE / ESCADA)
       if (nomeUpper.includes('VP') || nomeUpper.includes('VE') || nomeUpper.includes('ESCADA')) {
-        return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><line x1="6" y1="18" x2="54" y2="18" stroke="%2394a3b8" stroke-width="4"/><line x1="12" y1="14" x2="12" y2="22" stroke="%2394a3b8" stroke-width="2"/><line x1="24" y1="14" x2="24" y2="22" stroke="%2394a3b8" stroke-width="2"/><line x1="36" y1="14" x2="36" y2="22" stroke="%2394a3b8" stroke-width="2"/><line x1="48" y1="14" x2="48" y2="22" stroke="%2394a3b8" stroke-width="2"/><rect x="6" y="24" width="52" height="20" fill="%23ef4444"/><circle cx="18" cy="44" r="6" fill="%231e293b"/><circle cx="46" cy="44" r="6" fill="%231e293b"/></svg>';
+        return `<svg viewBox="0 0 24 24"><path d="M19 12v5c0 1.1-.9 2-2 2h-1c0 1.66-1.34 3-3 3s-3-1.34-3-3H9c0 1.66-1.34 3-3 3S3 20.66 3 19H2v-7h17zm-13 7.5c.83 0 1.5-.67 1.5-1.5S6.83 16.5 6 16.5 4.5 17.17 4.5 18s.67 1.5 1.5 1.5zm9 0c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zM2 8l18-3v2L2 10V8zm2-4l18-3v2L4 6V4z"/></svg>`;
       }
-      
-      // Imagem Padrão / Genérica para Viaturas de Emergência
-      return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect x="6" y="20" width="52" height="24" rx="4" fill="%23ef4444"/><rect x="42" y="24" width="12" height="8" fill="%2338bdf8"/><circle cx="18" cy="44" r="6" fill="%231e293b"/><circle cx="46" cy="44" r="6" fill="%231e293b"/><path d="M26 14 L38 14 L34 20 L30 20 Z" fill="%230284c7"/></svg>';
+
+      // Ícone padrão para outras viaturas de emergência
+      return `<svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.04 3H5.81l1.04-3zM19 17H5v-4h14v4z"/><circle cx="7.5" cy="15" r="1.5"/><circle cx="16.5" cy="15" r="1.5"/></svg>`;
     }
 
     // Mapeamento dos níveis de Risco de Incêndio Rural (RCM)
@@ -593,7 +602,7 @@
       }
     }
 
-    // 2. VIATURAS INOP (Com imagem vetorial do veículo)
+    // 2. VIATURAS INOP (Injeção Vetorial SVG direta)
     async function carregarViaturasINOP() {
       try {
         const res = await fetch(`${URL_VIATURAS}&_t=${Date.now()}`);
@@ -616,13 +625,15 @@
         viaturasInop.forEach(v => {
           const nome = v['Viatura'] || v['Veículo'] || 'N/A';
           const motivo = v['Motivo'] || v['Avaria'] || v['Observações'] || 'Avaria Registada';
-          const imgUrl = obterImagemViatura(nome);
+          const svgCode = obterSVGSimboloViatura(nome);
 
           const div = document.createElement('div');
           div.className = 'card card-inop';
           div.innerHTML = `
             <div class="inop-esquerda">
-              <img src="${imgUrl}" alt="${nome}" class="inop-img">
+              <div class="inop-icon-box">
+                ${svgCode}
+              </div>
               <div class="inop-info">
                 <h4>${nome}</h4>
                 <p>${motivo}</p>
